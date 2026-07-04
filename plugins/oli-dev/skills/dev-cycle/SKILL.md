@@ -28,9 +28,11 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
    bloqueia isso de forma determinística (push/commit), e a Fase 0 recusa retomar numa branch mergeada.
 4. **Modelo por tier (conductor sempre Opus).** O loop principal (conductor) é **sempre Opus 4.8** —
    Fase 0 checa; cobre plano, adjudicação e os gates inline `/simplify`/`verify`/`/security-review`.
-   Os dois papéis despachados seguem o **tier**: escritores TDD (Fase 4) e staff-reviewer (Fase 2)
-   → `full` = `model: "opus"` (default), `light` = `model: "sonnet"`. `/code-review` roda seu fleet
-   próprio (fora do tier). Effort alto nos reviews. Ver `references/model-tiers.md`.
+   Os papéis despachados com `model:` seguem o **tier**: staff-reviewer (Fase 2) e, na Fase 4,
+   escritores TDD + task-reviewers + fix-subagents → `full` = `model: "opus"` (default),
+   `light` = `model: "sonnet"`. **Exceção: o review final de branch (Fase 4) é sempre Opus.**
+   `/code-review` roda seu fleet próprio (fora do tier). Effort alto nos reviews.
+   Ver `references/model-tiers.md`.
 
 ## Workflow
 
@@ -41,7 +43,7 @@ Carregue o `references/*.md` da fase **quando ela começa** (progressive disclos
 - **Fase 1 — BRAINSTORM** → invoca `superpowers:brainstorming`. Spec em `docs/superpowers/specs/`. Commit.
 - **Fase 2 — REVIEW pré-código** → ver `references/review-gates.md`. 1 `staff-reviewer` cético (modelo por tier: `full`=Opus, `light`=Sonnet). Resolve achados. Commit.
 - **Fase 3 — PLANO** → invoca `superpowers:writing-plans`. Commit.
-- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD, subagentes com `model:` por tier (`full`=opus, `light`=sonnet). Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
+- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores, task-reviewers e fix-subagents com `model:` por tier (`full`=opus, `light`=sonnet); o **review final de branch é sempre Opus**. Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
 - **Fase 5 — REVIEW pós-código** → ver `references/review-gates.md`. `/code-review` → `/simplify` → `verify`; sub-gate condicional `/security-review` se o diff toca superfície sensível. Idêntica nos dois tiers (conductor adjudica em Opus; `/code-review` tem fleet próprio).
 - **Fase 6 — PRE-PUSH gate** → ver `references/pre-push-gate.md`. Prefere `scripts/check.sh --fast` do repo; senão fallback ruff+mypy (ou lint+test+build p/ node). Bloqueia se falhar, com evidência.
 - **Fase 7 — PUSH + PR** → `commit-commands:commit-push-pr`. Base = `main`. O push leva o prefixo `OLI_DEV_GATE_OK=1` (gate já rodou na Fase 6 → hook não re-roda). Usa `assets/pr-body-template.md`. Termina aqui.
