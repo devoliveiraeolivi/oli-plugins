@@ -5,6 +5,20 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 
 ## oli-dev
 
+### [Unreleased]
+
+#### Changed
+
+- **Tier `light` explicita TODOS os papéis despachados da Fase 4**
+  (`references/model-tiers.md` + SKILL.md): além dos escritores TDD, os
+  **task-reviewers** e **fix-subagents** do subagent-driven-development também
+  seguem o tier (`light` = Sonnet) — fecha a ambiguidade entre o SKILL.md
+  ("subagentes", plural) e a matriz (só "escritores"). **Exceção nova e
+  explícita: o review final de branch é sempre Opus** nos dois tiers (última
+  rede antes da Fase 5; guidance do SDD manda o review de branch para o modelo
+  mais capaz). Haiku fica documentado como fora do tier por decisão (custo de
+  turnos em trabalho multi-step), não por limitação.
+
 ### [oli-dev-v1.0.0] — 2026-07-04
 
 Primeira release do plugin como projeto independente, extraído do `oli-devops`
