@@ -19,7 +19,7 @@ PYTHON="$(command -v python3 || command -v python)" || fail "no python interpret
 import json, sys
 root = sys.argv[1]
 mk = json.load(open(f"{root}/.claude-plugin/marketplace.json"))
-assert mk.get("name") == "oli-devops", mk.get("name")
+assert mk.get("name") == "oli-plugins", mk.get("name")
 plugins = mk.get("plugins", [])
 assert any(p.get("name") == "oli-dev" for p in plugins), "oli-dev not registered in marketplace"
 pj = json.load(open(f"{root}/plugins/oli-dev/.claude-plugin/plugin.json"))

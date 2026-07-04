@@ -11,7 +11,7 @@ encadeando skills do **superpowers** com gates opinativos.
 
 ## Instalação
 ```
-/plugin marketplace add devoliveiraeolivi/oli-devops
+/plugin marketplace add devoliveiraeolivi/oli-plugins
 /plugin install oli-dev
 ```
 
