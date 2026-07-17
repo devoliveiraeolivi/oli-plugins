@@ -33,6 +33,16 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
    `light` = `model: "sonnet"`. **Exceção: o review final de branch (Fase 4) é sempre Opus.**
    `/code-review` roda seu fleet próprio (fora do tier). Effort alto nos reviews.
    Ver `references/model-tiers.md`.
+5. **Não presuma o que não dá pra verificar — pergunte, se for material.** Vale em todas as fases:
+   se um fato carrega o design e a fonte é memória, inferência ou "deve ser assim", pare e confirme
+   com o usuário antes de escrever spec, plano ou código. Fonte verificada = arquivo:linha no repo,
+   output de comando, doc do `oli-platform`, ou confirmação explícita do usuário.
+   **Não trave por detalhe:** se a premissa é barata de reverter ou tem default óbvio, assuma o
+   default, registre como premissa na spec e siga — pergunta só quando errar custa retrabalho.
+   Caso mais comum: **banco de dados** — schema, tabelas, colunas, RPCs, policies e dados
+   existentes nunca se inferem de nome de campo. E todo SQL que altera schema ou dados
+   (DDL, migration, backfill) vai como bloco explícito para o usuário rodar/aprovar
+   manualmente; a skill não executa SQL por conta própria.
 
 ## Workflow
 
@@ -41,6 +51,9 @@ Carregue o `references/*.md` da fase **quando ela começa** (progressive disclos
 
 - **Fase 0 — SETUP gate** → ver `references/setup-gate.md`. Checa Opus + deps + tier (`full`/`light`) + cria worktree da main (EnterWorktree nativo preferido; fallback `using-git-worktrees`) + ponytail por tier (opcional). Resume/checkpoint: detecta spec/plano existentes e retoma da fase certa (pede confirmação antes de pular).
 - **Fase 1 — BRAINSTORM** → invoca `superpowers:brainstorming`. Spec em `docs/superpowers/specs/`. Commit.
+  Aplique o princípio 5: cada premissa da spec com fonte verificada ou confirmada com o usuário —
+  banco (`architecture/supabase-inventory.md`) inclusive; SQL de schema/dados entra como bloco
+  para aprovação manual.
 - **Fase 2 — REVIEW pré-código** → ver `references/review-gates.md`. 1 `staff-reviewer` cético (modelo por tier: `full`=Opus, `light`=Sonnet). Resolve achados. Commit.
 - **Fase 3 — PLANO** → invoca `superpowers:writing-plans`. Commit.
 - **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores, task-reviewers e fix-subagents com `model:` por tier (`full`=opus, `light`=sonnet); o **review final de branch é sempre Opus**. Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
@@ -54,6 +67,9 @@ Carregue o `references/*.md` da fase **quando ela começa** (progressive disclos
 Antes de declarar qualquer fase concluída, confirme com **evidência** (output real, nunca alegação):
 - Fase 0: worktree existe e está na branch certa (`git worktree list`, `git branch --show-current`);
   se ponytail presente e tier=`light`, o nível foi confirmado com output colado.
+- Fase 1: toda afirmação material da spec tem fonte (arquivo:linha, output, ou confirmação do
+  usuário) — o resto vai listado como premissa assumida; SQL de schema/dados aparece como bloco
+  para aprovação manual, não como passo automático.
 - Fase 2/5: o staff-reviewer foi despachado com o `model:` do tier, o conductor adjudicou em Opus, e os achados materiais foram resolvidos.
 - Fase 6: os comandos do gate passaram (cole o output).
 - Fase 7: a PR foi criada (URL).
