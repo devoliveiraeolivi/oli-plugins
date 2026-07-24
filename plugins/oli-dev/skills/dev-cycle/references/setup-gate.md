@@ -1,6 +1,6 @@
 # Fase 0 — SETUP gate
 
-1. **Modelo.** Confirme que o loop principal está em Opus 4.8. Skill não troca modelo: se não
+1. **Modelo.** Confirme que o loop principal está em Opus 5. Skill não troca modelo: se não
    estiver, **bloqueie** e peça `/model` (ou `/fast` no Opus). Não prossiga sem confirmação.
 2. **Dependências.** Verifique que as skills do superpowers necessárias existem
    (brainstorming, writing-plans, subagent-driven-development, test-driven-development,
