@@ -5,7 +5,7 @@ encadeando skills do **superpowers** com gates opinativos.
 
 ## Requisitos
 - **superpowers** instalado (este plugin invoca suas skills). Sem ele, a skill avisa e para.
-- **Loop principal em Opus 4.8.** Uma skill é markdown e não troca o modelo da sessão; a Fase 0
+- **Loop principal em Opus 5.** Uma skill é markdown e não troca o modelo da sessão; a Fase 0
   verifica e bloqueia até você confirmar. O conductor é sempre Opus; os subagentes despachados
   (escritores TDD + staff-reviewer) seguem o **tier** (`full`=Opus, `light`=Sonnet).
 
@@ -17,7 +17,7 @@ encadeando skills do **superpowers** com gates opinativos.
 
 ## Uso
 - `/oli-dev <ideia da feature>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default).
-- `/oli-dev light <ideia>` → tier `light`: escritores TDD + staff-reviewer em **Sonnet 4.6** (custo/latência;
+- `/oli-dev light <ideia>` → tier `light`: escritores TDD + staff-reviewer em **Sonnet 5** (custo/latência;
   conductor e `/code-review`/`verify`/`/security-review` inalterados). Ver `skills/dev-cycle/references/model-tiers.md`.
   Com o plugin **ponytail** presente, o tier light também ativa `/ponytail lite` na Fase 0 (opcional, fail-open).
 - `/oli-dev finalize` → close-out + limpeza pós-merge (Fase 8), depois que a PR foi mergeada.

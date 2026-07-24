@@ -16,7 +16,7 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 ## Prerequisites
 
 - Plugin **superpowers** instalado (esta skill o invoca). Se faltar, avise e pare.
-- Loop principal em **Opus 4.8** (verificado na Fase 0).
+- Loop principal em **Opus 5** (verificado na Fase 0).
 - Repo alvo é um git repo com `main` e remoto configurado.
 
 ## Princípios de processo (gates duros — invioláveis)
@@ -26,7 +26,7 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 3. **Nunca deletar branch** — nem continuar empurrando nela — sem `gh pr view <n> --json state`.
    Se a PR está `MERGED`, commits/pushes na branch viram órfãos; o hook `branch-state-guard.sh`
    bloqueia isso de forma determinística (push/commit), e a Fase 0 recusa retomar numa branch mergeada.
-4. **Modelo por tier (conductor sempre Opus).** O loop principal (conductor) é **sempre Opus 4.8** —
+4. **Modelo por tier (conductor sempre Opus).** O loop principal (conductor) é **sempre Opus 5** —
    Fase 0 checa; cobre plano, adjudicação e os gates inline `/simplify`/`verify`/`/security-review`.
    Os papéis despachados com `model:` seguem o **tier**: staff-reviewer (Fase 2) e, na Fase 4,
    escritores TDD + task-reviewers + fix-subagents → `full` = `model: "opus"` (default),
