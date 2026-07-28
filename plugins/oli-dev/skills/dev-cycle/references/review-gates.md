@@ -1,4 +1,4 @@
-# Review gates (Producer-Reviewer; modelo por tier — ver `references/model-tiers.md`)
+# Review gates (Producer-Reviewer; um caça-bug por artefato, camadas por tier — ver `references/model-tiers.md`)
 
 ## Princípio inviolável — evidência ou abstenha (todos os gates)
 
@@ -19,20 +19,25 @@ staff-reviewer (Fase 2), pros gates da Fase 5 e pro conductor.
   código que está certo por causa de um "achado" que o reviewer não verificou).
 
 ## Fase 2 — pré-código (sobre brainstorm + spec)
-Despache **1 subagente `staff-reviewer`** (effort alto) com o `model:` do tier
-(`full` → `"opus"`, `light` → `"sonnet"`; ver `references/model-tiers.md`). Mandato cético:
-complexidade desnecessária, requisito ambíguo, escopo inflado, riscos não tratados, suposições
-não verificadas. Incorpore achados, atualize o spec, checkpoint commit. Só avance quando o spec
-sobrevive ao review.
+Despache **1 subagente `staff-reviewer`** (effort alto) em **Opus nos dois tiers** — julgamento
+sobre a spec inteira não é onde se economiza modelo (ver `references/model-tiers.md`). Mandato
+cético: complexidade desnecessária, requisito ambíguo, escopo inflado, riscos não tratados,
+suposições não verificadas. Incorpore achados, atualize o spec, checkpoint commit. Só avance
+quando o spec sobrevive ao review.
 
 ## Fase 5 — pós-código (sobre o diff)
-Encadeie na ordem (proposital, não reordene). Estes gates **não** são model-controláveis pelo
-tier: `/code-review` roda seu fleet próprio; `/simplify`/`verify`/`/security-review` rodam no
-contexto do conductor (**Opus 5**), que adjudica. Ou seja, a Fase 5 é idêntica em `full` e `light`:
+Encadeie na ordem (proposital, não reordene). Nenhum destes gates é model-controlável pelo tier:
+`/code-review` roda seu fleet próprio; `/simplify`/`verify`/`/security-review` rodam no
+contexto do conductor (**Opus 5**), que adjudica. A Fase 5 é idêntica em `full` e `light`:
 1. `/code-review` (effort alto) — bugs de correção; verifique achados adversarialmente.
-2. `/simplify` — reuso/simplificação/eficiência (qualidade, não bugs). Roda **depois** do code-review
-   (não simplificar código com bug em aberto) e **antes** do verify (o verify valida o resultado já simplificado).
+   **Este é o único caça-bug de contexto fresco sobre o diff inteiro** — ele substitui o
+   whole-branch review que o SDD faria no fecho da Fase 4 (ver `model-tiers.md`), em vez de repetí-lo.
+2. `/simplify` — **condicional: só se o diff passa de ~150 linhas alteradas** (`git diff --stat`
+   vs. `main`); em diff pequeno rende churn cosmético e ainda cobra a adjudicação. Em dúvida, rode.
+   Quando roda, é **depois** do code-review (não simplificar código com bug em aberto) e **antes**
+   do verify (o verify valida o resultado já simplificado).
 3. `verify` / `superpowers:verification-before-completion` — rode testes/app de verdade, com evidência.
+   **Sempre**, em qualquer tier e qualquer tamanho de diff.
 
 ### O `/simplify` NÃO é soberano — é conservador e adjudicado
 O simplify erra para o lado da **concisão**, e concisão que remove tratamento, caso de borda ou
@@ -59,6 +64,14 @@ Buraco temporário vira eterno. Um TODO, stub, `pass`, `...`, mock deixado no lu
 
 Quem tem a palavra final no gate pós-código é o **`verify`** (objetivo: testes verdes com evidência)
 somado ao conductor (subjetivo: melhora real, sem buracos, respeito às convenções). Nada vai pra push sem isso.
+
+## O que NÃO fazer: empilhar review sobre review
+Passe de LLM sobre o mesmo diff custa token e tempo, e o retorno **cai rápido** depois do primeiro
+reviewer de contexto fresco: o segundo relê o mesmo código com o mesmo prior e produz sobretudo
+concordância e churn. Por isso o ciclo tem **um** caça-bug por artefato — spec → staff-reviewer (F2);
+diff → `/code-review` (F5) — e não um review do review. Se você está por dispachar um reviewer
+adicional "só pra conferir", a pergunta certa é se existe **artefato novo** ou apenas o mesmo diff
+relido. Sem artefato novo, o gate que agrega é o objetivo (`verify`, Fase 6), não outra opinião.
 
 ### Sub-gate condicional de security-review
 Se o diff toca **superfície sensível** — auth, secrets/`.env`, SQL/RPC, rede/HTTP, credenciais,

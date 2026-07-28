@@ -21,6 +21,13 @@ grep -qi  'opus'   "$MT" || fail "model-tiers.md must mention Opus"
 grep -qi 'tier' "$BASE/references/review-gates.md" || fail "review-gates.md must reference the model tier"
 grep -qi 'opus' "$BASE/references/review-gates.md" || fail "review-gates.md must document the Opus conductor/adjudication"
 grep -qi 'security-review' "$BASE/references/review-gates.md" || fail "review-gates.md missing security sub-gate"
+# Um caça-bug por artefato: o review final de branch da F4 NÃO roda (a F5 cobre o mesmo diff),
+# e o /simplify é condicional ao tamanho do diff. Guarda contra re-adicionar a camada por
+# deferência ao SDD numa edição futura.
+grep -qi 'review final de branch' "$MT" || fail "model-tiers.md must state the branch-review removal"
+grep -qi 'override deliberado' "$MT" || fail "model-tiers.md must flag the SDD override explicitly"
+grep -qi '150' "$MT" || fail "model-tiers.md must state the /simplify diff threshold"
+grep -qi '150' "$BASE/references/review-gates.md" || fail "review-gates.md must state the /simplify diff threshold"
 grep -qi 'MERGED' "$BASE/references/finalize.md" || fail "finalize.md must gate on MERGED state"
 grep -qi 'pyproject\|package.json' "$BASE/references/pre-push-gate.md" || fail "pre-push-gate.md missing stack detection"
 grep -qi 'main' "$BASE/references/setup-gate.md" || fail "setup-gate.md must require branch from main"

@@ -9,15 +9,36 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 
 #### Changed
 
+- **Um caça-bug por artefato — o tier passa a trocar camadas de review, não modelo
+  de julgamento.** O custo/latência do ciclo vinha do número de passes de LLM sobre
+  o mesmo código (~15 numa mudança de 4 tasks, nos dois tiers), não do modelo de cada
+  passe. Mudanças:
+  - **Base (`full` e `light`): sem review final de branch na Fase 4** — a Fase 5 roda
+    `/code-review` sobre o mesmo diff com fleet maior. Era o mesmo trabalho duas vezes.
+    Override deliberado do SDD, marcado como tal para não voltar por deferência.
+  - **Base: `/simplify` condicional** ao diff passar de ~150 linhas alteradas; em diff
+    pequeno rendia churn cosmético + adjudicação.
+  - **`light` derruba camada** (sem task-reviewer por task) em vez de rebaixar modelo.
+    Único downgrade que resta: escritores TDD → Sonnet (maior volume de token, menor
+    exigência de julgamento, saída verificada por execução de teste).
+  - **Staff-reviewer (F2) volta pra Opus nos dois tiers.** Economizar modelo em gate de
+    review produz palpite com selo de "revisado" — o que `review-gates.md` já chamava de
+    pior que não ter reviewer.
+  - Intocados: Fase 6 (lint/test) e `verify` — os únicos gates que produzem verdade
+    objetiva e custam zero token.
+  - Passes de LLM numa mudança de 4 tasks: **`full` ~10 · `light` ~6** (era ~15/~15).
+  - Evals novos: `redundant_branch_review`, `simplify_on_tiny_diff`.
+
 - **Tier `light` explicita TODOS os papéis despachados da Fase 4**
   (`references/model-tiers.md` + SKILL.md): além dos escritores TDD, os
   **task-reviewers** e **fix-subagents** do subagent-driven-development também
   seguem o tier (`light` = Sonnet) — fecha a ambiguidade entre o SKILL.md
-  ("subagentes", plural) e a matriz (só "escritores"). **Exceção nova e
-  explícita: o review final de branch é sempre Opus** nos dois tiers (última
-  rede antes da Fase 5; guidance do SDD manda o review de branch para o modelo
-  mais capaz). Haiku fica documentado como fora do tier por decisão (custo de
-  turnos em trabalho multi-step), não por limitação.
+  ("subagentes", plural) e a matriz (só "escritores"). ~~Exceção nova e
+  explícita: o review final de branch é sempre Opus nos dois tiers~~ —
+  **superseda pela entrada acima**: o review final de branch deixou de rodar
+  (a Fase 5 cobre o mesmo diff), então não há modelo a fixar. Haiku fica
+  documentado como fora do tier por decisão (custo de turnos em trabalho
+  multi-step), não por limitação.
 
 ### [oli-dev-v1.0.0] — 2026-07-04
 
