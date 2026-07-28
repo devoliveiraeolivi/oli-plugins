@@ -1,13 +1,13 @@
 ---
 name: dev-cycle
-description: Use ao construir uma feature/mudança nova no ecossistema OLI — conduz o ciclo completo (worktree da main, brainstorm, review staff cético, plano, escrita TDD por subagente com modelo por tier, review code/simplify/verify, pre-push gate, PR, finalize pós-merge). Invocada por `/oli-dev [light] <ideia>` e `/oli-dev finalize`.
+description: Use ao construir uma feature/mudança nova no ecossistema OLI — conduz o ciclo completo (worktree da main, brainstorm, review staff cético, plano, escrita TDD por subagente, review code/simplify/verify, pre-push gate, PR, finalize pós-merge), com um caça-bug por artefato e tier `full`/`light` trocando camadas de review. Invocada por `/oli-dev [light] <ideia>` e `/oli-dev finalize`.
 ---
 
 # dev-cycle — maestro do ciclo de desenvolvimento OLI
 
 ## When to Use
 
-- `/oli-dev [light] <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default) ou `light` (escritores TDD + staff-reviewer em Sonnet) — ver `references/model-tiers.md`.
+- `/oli-dev [light] <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default) ou `light` (menos camadas de review + escritores TDD em Sonnet) — ver `references/model-tiers.md`.
 - `/oli-dev finalize` → só a Fase 8 (close-out + limpeza), depois que a PR foi mergeada.
 - Ative também quando o usuário descreve uma feature nova e pede para "construir/implementar".
 
@@ -26,13 +26,15 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 3. **Nunca deletar branch** — nem continuar empurrando nela — sem `gh pr view <n> --json state`.
    Se a PR está `MERGED`, commits/pushes na branch viram órfãos; o hook `branch-state-guard.sh`
    bloqueia isso de forma determinística (push/commit), e a Fase 0 recusa retomar numa branch mergeada.
-4. **Modelo por tier (conductor sempre Opus).** O loop principal (conductor) é **sempre Opus 5** —
-   Fase 0 checa; cobre plano, adjudicação e os gates inline `/simplify`/`verify`/`/security-review`.
-   Os papéis despachados com `model:` seguem o **tier**: staff-reviewer (Fase 2) e, na Fase 4,
-   escritores TDD + task-reviewers + fix-subagents → `full` = `model: "opus"` (default),
-   `light` = `model: "sonnet"`. **Exceção: o review final de branch (Fase 4) é sempre Opus.**
-   `/code-review` roda seu fleet próprio (fora do tier). Effort alto nos reviews.
-   Ver `references/model-tiers.md`.
+4. **Um caça-bug por artefato — o tier troca camada, não modelo de julgamento.**
+   Passe de LLM sobre o mesmo código é o custo real do ciclo; review do review rende
+   concordância e churn. Então: spec → staff-reviewer (F2); diff → `/code-review` (F5).
+   **Sem review final de branch na Fase 4** — a F5 cobre o mesmo diff com fleet maior
+   (override deliberado do SDD; não re-adicione). O conductor é **sempre Opus 5** (Fase 0 checa),
+   e todo papel de julgamento também: staff-reviewer (F2) e adjudicação, nos dois tiers.
+   O `light` **derruba camada** (sem task-reviewer por task) e faz **um** downgrade de modelo:
+   escritores TDD → `model: "sonnet"`. `/code-review` roda fleet próprio (fora do tier).
+   Effort alto nos reviews. Ver `references/model-tiers.md`.
 5. **Não presuma o que não dá pra verificar — pergunte, se for material.** Vale em todas as fases:
    se um fato carrega o design e a fonte é memória, inferência ou "deve ser assim", pare e confirme
    com o usuário antes de escrever spec, plano ou código. Fonte verificada = arquivo:linha no repo,
@@ -54,10 +56,10 @@ Carregue o `references/*.md` da fase **quando ela começa** (progressive disclos
   Aplique o princípio 5: cada premissa da spec com fonte verificada ou confirmada com o usuário —
   banco (`architecture/supabase-inventory.md`) inclusive; SQL de schema/dados entra como bloco
   para aprovação manual.
-- **Fase 2 — REVIEW pré-código** → ver `references/review-gates.md`. 1 `staff-reviewer` cético (modelo por tier: `full`=Opus, `light`=Sonnet). Resolve achados. Commit.
+- **Fase 2 — REVIEW pré-código** → ver `references/review-gates.md`. 1 `staff-reviewer` cético, **Opus nos dois tiers**. Resolve achados. Commit.
 - **Fase 3 — PLANO** → invoca `superpowers:writing-plans`. Commit.
-- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores, task-reviewers e fix-subagents com `model:` por tier (`full`=opus, `light`=sonnet); o **review final de branch é sempre Opus**. Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
-- **Fase 5 — REVIEW pós-código** → ver `references/review-gates.md`. `/code-review` → `/simplify` → `verify`; sub-gate condicional `/security-review` se o diff toca superfície sensível. Idêntica nos dois tiers (conductor adjudica em Opus; `/code-review` tem fleet próprio).
+- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores com `model:` por tier (`full`=opus, `light`=sonnet); task-reviewer por task só no `full`; **sem review final de branch nos dois tiers** (coberto pela Fase 5 — override deliberado do SDD). Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
+- **Fase 5 — REVIEW pós-código** → ver `references/review-gates.md`. `/code-review` → `/simplify` (só se diff > ~150 linhas) → `verify` (sempre); sub-gate condicional `/security-review` se o diff toca superfície sensível. Idêntica nos dois tiers (conductor adjudica em Opus; `/code-review` tem fleet próprio).
 - **Fase 6 — PRE-PUSH gate** → ver `references/pre-push-gate.md`. Prefere `scripts/check.sh --fast` do repo; senão fallback ruff+mypy (ou lint+test+build p/ node). Bloqueia se falhar, com evidência.
 - **Fase 7 — PUSH + PR** → `commit-commands:commit-push-pr`. Base = `main`. O push leva o prefixo `OLI_DEV_GATE_OK=1` (gate já rodou na Fase 6 → hook não re-roda). Usa `assets/pr-body-template.md`. Termina aqui.
 - **Fase 8 — FINALIZE** (`/oli-dev finalize`) → ver `references/finalize.md`. Verifica `MERGED`, limpa worktree+branch, close-out (`assets/close-out-checklist.md`).
@@ -70,7 +72,7 @@ Antes de declarar qualquer fase concluída, confirme com **evidência** (output 
 - Fase 1: toda afirmação material da spec tem fonte (arquivo:linha, output, ou confirmação do
   usuário) — o resto vai listado como premissa assumida; SQL de schema/dados aparece como bloco
   para aprovação manual, não como passo automático.
-- Fase 2/5: o staff-reviewer foi despachado com o `model:` do tier, o conductor adjudicou em Opus, e os achados materiais foram resolvidos.
+- Fase 2/5: o staff-reviewer foi despachado em Opus, o conductor adjudicou em Opus, e os achados materiais foram resolvidos. Se o `/simplify` foi pulado, o motivo é o tamanho do diff — cole o `git diff --stat`.
 - Fase 6: os comandos do gate passaram (cole o output).
 - Fase 7: a PR foi criada (URL).
 - Fase 8: `gh pr view --json state` == `MERGED` antes de qualquer delete; worktree removido; close-out feito.

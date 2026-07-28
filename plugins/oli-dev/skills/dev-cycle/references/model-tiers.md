@@ -1,70 +1,75 @@
-# Tiers de modelo — `full` (default) e `light`
+# Tiers — `full` (default) e `light`
 
-Fonte única do tier de modelo do `/oli-dev`. Carregada na Fase 0.
+Fonte única do tier do `/oli-dev`. Carregada na Fase 0.
 
-## Princípio (o que o tier muda — e o que NÃO muda)
+## Princípio: o tier troca **camadas de review**, não modelo de julgamento
 
-O tier troca **apenas o modelo dos papéis cujo modelo o conductor realmente
-controla** — os despachados via `Agent`/`subagent-driven-development` com `model:`
-explícito: o **staff-reviewer (Fase 2)** e, na **Fase 4**, os **escritores TDD**,
-os **task-reviewers** e os **fix-subagents**. **Exceção deliberada:** o **review
-final de branch** (Fase 4, fecho do subagent-driven-development) é **sempre Opus**
-nos dois tiers — a guidance do próprio SDD manda o review de branch inteiro para o
-modelo mais capaz, e ele é a última rede antes da Fase 5.
+O custo e a latência do ciclo vêm do **número de passes de LLM sobre o mesmo código**, não do
+modelo de cada passe. E downgrade de modelo num gate de review economiza no lugar errado:
+produz palpite com selo de "revisado" — exatamente o que o `review-gates.md` chama de pior que
+não ter reviewer. Logo:
 
-Escopo desta matriz: **modelo, e só modelo**. Integrações ambientes opcionais condicionadas
-ao tier (quando presentes na sessão) vivem na **Fase 0** — ver `setup-gate.md`, passo 7 —
-e não entram nesta fonte única.
+- **O tier derruba camada redundante.** É o botão principal.
+- **Um único downgrade de modelo:** os **escritores TDD** (Fase 4) no `light`. É o papel de maior
+  volume de token e o de menor exigência de julgamento — o que ele produz é verificado por
+  execução de teste, não por opinião.
+- **Todo papel de julgamento roda em Opus nos dois tiers** — conductor, staff-reviewer (Fase 2),
+  adjudicação.
 
-**Justificativa = custo/latência, não qualidade.** A rede que pega bug é **idêntica**
-nos dois tiers. Não use o tier como se fosse "mesma qualidade mais barato" — a aposta
-honesta é: onde a produção de código pode ir pra Sonnet, o ganho de token/latência é
-real e a rede de segurança continua de pé.
+Escopo desta matriz: **camadas e modelo**. Integrações ambientes opcionais condicionadas ao tier
+(quando presentes na sessão) vivem na **Fase 0** — ver `setup-gate.md`, passo 7.
 
-## O que é (e não é) controlável por tier
+## Base dos dois tiers (isto não é tier — é o fluxo)
 
-| Papel | Como roda | Tier controla? |
-|---|---|---|
-| **Conductor** (loop principal) | modelo da sessão | **Não** — sempre Opus (Fase 0). Cobre brainstorm (F1), plano (F3), adjudicação, e os gates inline `/simplify` · `verify` · `/security-review`, que herdam o Opus do conductor |
-| **Escritores TDD** (Fase 4) | `Agent` / subagent-driven-development, `model:` | **SIM — modelo** |
-| **Task-reviewers + fix-subagents** (Fase 4) | `Agent` dispatch do SDD, `model:` | **SIM — modelo** |
-| **Review final de branch** (Fase 4, fecho do SDD) | `Agent` dispatch, `model:` | **Não por política** — sempre Opus (última rede antes da Fase 5) |
-| **Staff-reviewer** (Fase 2) | `Agent` dispatch, `model:` | **SIM — modelo** |
-| **`/code-review`** (Fase 5) | slash-command, fleet Haiku+Sonnet próprio | **Não** (nem modelo; nem mexemos no effort) |
+Duas remoções valem igualmente em `full` e `light`:
 
-Base factual (verificada): `/code-review` é um command que define o próprio fleet e opera
-sobre o diff/PR — o conductor não passa `model:` pra ele. `/simplify`, `verify`,
-`/security-review` são built-in e rodam no contexto do conductor (Opus). Logo o botão
-honesto do tier é o **modelo dos papéis despachados com `model:` (Fases 2 e 4)** —
-menos o review final de branch, fixado em Opus por política.
+1. **Sem review final de branch na Fase 4.** O SDD
+   (`superpowers:subagent-driven-development`) prescreve um whole-branch review no fecho — e a
+   **Fase 5 roda `/code-review` sobre o mesmo diff, com fleet maior**. É o mesmo trabalho duas
+   vezes. A Fase 5 **substitui** esse gate, não o dispensa.
+   ⚠️ **Override deliberado do SDD** — não re-adicione por deferência à skill invocada.
+2. **`/simplify` condicional:** só quando o diff passa de **~150 linhas alteradas**
+   (`git diff --stat` vs. `main`). Em diff pequeno ele rende churn cosmético e ainda cobra a
+   adjudicação do conductor. Em dúvida, rode.
 
-**Fora do tier por decisão (não por limitação): Haiku.** A guidance do SDD permite
-o tier mais barato p/ fixes de 1 arquivo e implementação-transcrição, mas avisa que
-modelos mais baratos gastam 2–3× mais turnos em trabalho multi-step — e TDD é
-multi-step por natureza. O piso do `light` é Sonnet; revisite só com medição.
+O que **nunca** cai, em nenhum tier: **Fase 6** (lint/test/typecheck — determinístico, zero token)
+e o **`verify`** da Fase 5. São os únicos gates que produzem verdade objetiva em vez de opinião;
+foi por isso que sobreviveram ao corte.
 
 ## A matriz
 
-| Papel | `full` (default) | `light` |
+| Papel / camada | `full` (default) | `light` |
 |---|---|---|
-| Conductor (+ F1 brainstorm + F3 plano + adjudicação + inline `/simplify` `verify` `/security-review`) | Opus | Opus |
-| Fase 5 — `/code-review` (fleet próprio) | inalterado | inalterado |
-| Fase 4 — escritores TDD | Opus | **Sonnet** (`model: "sonnet"`) |
-| Fase 4 — task-reviewers + fix-subagents | Opus | **Sonnet** (`model: "sonnet"`) |
-| Fase 4 — **review final de branch** | **Opus** | **Opus** (sempre — última rede antes da Fase 5) |
-| Fase 2 — staff-reviewer | Opus | **Sonnet** (`model: "sonnet"`) |
+| **Conductor** (F1 brainstorm · F3 plano · adjudicação · `/simplify` `verify` `/security-review` inline) | Opus | Opus |
+| **F2 — staff-reviewer** (sobre a spec) | Opus | **Opus** |
+| **F4 — escritores TDD** | Opus | **Sonnet** (`model: "sonnet"`) |
+| **F4 — task-reviewer por task** | Opus | **não roda** |
+| **F4 — fix-subagents** (só se houver achado) | Opus | Sonnet |
+| **F4 — review final de branch** | **não roda** (coberto pela F5) | **não roda** |
+| **F5 — `/code-review`** | fleet próprio, inalterado | inalterado |
+| **F5 — `/simplify`** | se diff > ~150 linhas | se diff > ~150 linhas |
+| **F5 — `verify`** | sempre | sempre |
+| **F6 — pre-push gate** | sempre | sempre |
 
-- **`full`** = comportamento idêntico ao `/oli-dev` de hoje (tudo Opus).
-- **`light`** = os papéis despachados das Fases 2 e 4 em Sonnet — escritores TDD,
-  task-reviewers, fix-subagents e staff-reviewer. O ganho vem sobretudo dos
-  **escritores** (vários subagentes, várias tasks — o maior sink de tokens).
-  Coerência interna: o staff-reviewer (que revisa o *spec inteiro*) já era Sonnet
-  no light; o reviewer de uma task individual não deve custar mais que ele.
+Passes de LLM numa mudança de 4 tasks: **`full` ~10 · `light` ~6** (era ~15 nos dois tiers).
+
+### Por que o `light` pode dispensar o task-reviewer
+O SDD diz *"never skip the task review"* — dispensá-lo é **override deliberado**, e a rede que
+sobra é explícita: (a) a task roda em **TDD**, e o ciclo vermelho→verde é verificação por
+**execução**, não por opinião; (b) o **`/code-review` da Fase 5** lê o diff inteiro com contexto
+fresco; (c) a **Fase 6** roda lint+test de verdade, com evidência colada.
+O que se perde é a checagem de **aderência à spec por task** — e é por isso que `light` é
+deliberado, nunca default.
+
+### Fora dos tiers por decisão (não por limitação): Haiku
+A guidance do SDD permite o tier mais barato p/ fixes de 1 arquivo e implementação-transcrição,
+mas avisa que modelos mais baratos gastam 2–3× mais turnos em trabalho multi-step — e TDD é
+multi-step por natureza. O piso do `light` é Sonnet; revisite só com medição.
 
 ## Invocação e parsing
 
 ```
-/oli-dev <ideia>          → tier full (default; = hoje)
+/oli-dev <ideia>          → tier full (default)
 /oli-dev light <ideia>    → tier light
 /oli-dev full <ideia>     → tier full explícito
 /oli-dev finalize         → modo finalize (Fase 8), sem tier
@@ -89,6 +94,7 @@ Se o usuário pedir **`light`** numa mudança que toca **contrato/enforcement**
 (`policies/ENFORCEMENT.md`, IDs de hook no `.pre-commit-hooks.yaml`, `security.yml`
 reusável, pins em `common.sh`) **ou superfície sensível** (auth, secrets, SQL/RPC, rede,
 cripto): **recomende `full`** e peça **confirmação explícita** (ack) para seguir em `light`.
+Aqui o que falta no `light` é a aderência-à-spec por task — justo o que erra caro em contrato.
 Como o default é `full`, o caminho seguro é o padrão e o `light` é sempre deliberado.
 (Isto é *prior* sobre a ideia; o sub-gate de `/security-review` na Fase 5 continua
 independente do tier e detecta superfície sensível pelo diff.)
