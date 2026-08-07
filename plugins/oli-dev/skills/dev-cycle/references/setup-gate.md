@@ -10,7 +10,7 @@
    indisponível); a ausência dela não bloqueia quando o caminho nativo existe.
 3. **Worktree (da main).** `git fetch` + garanta `main` atualizada. Crie o worktree **a partir da
    main** — nunca de outra feature branch, nunca pasta irmã do repo. Prefira o **EnterWorktree
-   nativo** (cria em `.claude/worktrees/`, já no `.gitignore`); sem ele, fallback
+   nativo** (cria em `.claude/worktrees/`); sem ele, fallback
    `superpowers:using-git-worktrees` (mecânica é da skill; garanta `.worktrees/` no `.gitignore`
    nesse caminho).
 4. **Resume/checkpoint.** Detecte artefatos: spec+plano → retome Fase 4; só spec → Fase 2/3;

@@ -9,6 +9,37 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 
 #### Changed
 
+- **Opus julga, Sonnet produz e coleta.** Duas mudanças com a mesma raiz:
+  - **Escritores TDD (F4) passam a Sonnet nos dois tiers** — deixam de ser a única
+    diferença de modelo entre `full` e `light`. O escritor nunca foi papel de julgamento:
+    a saída é conferida por execução de teste, não por opinião. Efeito: **o tier deixa de
+    trocar modelo** — só troca camada (task-reviewer roda ou não). ⚠️ Premissa de design,
+    não medição; reverter custa uma célula da matriz.
+  - **Linha de fix-subagents corrigida nas duas colunas.** Não era papel com modelo
+    próprio: o SDD retoma o próprio escritor (`subagent-driven-development/SKILL.md:322`)
+    e escala ≥1 tier acima na rodada 4 (`:174-175`). No `light` nada disparava o loop (sem
+    task-reviewer) — a célula era inalcançável desde o refactor anterior, que separou a
+    linha e não propagou. Linha nova para a rota `BLOCKED` (`:244-250`), independente de
+    review e válida nos dois tiers.
+  - **Princípio 6 novo: o conductor coordena.** Investigação e coleta de dados vão para
+    subagentes, paralelos quando independentes, com `model:` explícito (omitir herda o
+    modelo da sessão e vaza Opus). Ficam no conductor: adjudicação e a verificação que a
+    sustenta, os gates `verify` (F5) e Fase 6, comando determinístico, os artefatos que o
+    próprio conductor autora, e o estado da sessão. Limite anti-empilhamento no
+    `review-gates.md`: investigação paralela sobre artefatos que nenhum gate cobriu ≠
+    segundo reviewer sobre o mesmo diff.
+  - **Testes travam a condição, não a prosa:** nenhuma linha da matriz pode ser Opus no
+    `full` e Sonnet no `light`; a cláusula do Princípio 6 é ancorada pelos dois gates que
+    ela protege. Cada assert foi validado por sonda negativa (apagar a claim → assert
+    falha), depois de três tentativas com âncora fraca.
+  - Eval novo: `investigacao_disfarcada_de_review`. `light_tier_scope` reescrito.
+  - `setup-gate.md` não afirma mais que `.claude/worktrees/` está no `.gitignore` — o repo
+    não tem `.gitignore` (follow-up separado).
+  - ⚠️ **Medição do próprio ciclo:** esta mudança de ~80 linhas de doc custou 22+ despachos
+    de subagente e 5 rodadas de fix. A conta publicada abaixo (`full` ~10) não inclui
+    rodadas de fix, re-reviews nem investigação — está errada por 2-3×. Ver
+    `handoffs/2026-08-07-oli-dev-peso-do-ciclo-handoff.md`.
+
 - **Um caça-bug por artefato — o tier passa a trocar camadas de review, não modelo
   de julgamento.** O custo/latência do ciclo vinha do número de passes de LLM sobre
   o mesmo código (~15 numa mudança de 4 tasks, nos dois tiers), não do modelo de cada
