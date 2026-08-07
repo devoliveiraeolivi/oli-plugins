@@ -49,12 +49,15 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 6. **O conductor coordena — investigação e coleta de dados vão para subagentes, paralelos
    quando independentes.** O contexto do conductor é o recurso escasso do ciclo: gastá-lo lendo
    N arquivos é gastar o que decide. Antes de investigar, pergunte se dá pra despachar; antes de
-   despachar 2+, se são independentes — se forem, **fan-out numa mensagem só**. O investigador
+   despachar 2+, se são independentes — se forem, **fan-out numa mensagem só**. Despache só sobre
+   o que ninguém no ciclo leu ainda — nunca sobre artefato já coberto por um gate. O investigador
    volta com **fonte (`arquivo:linha`), não com conselho**, e é despachado com `model:`
    **explícito** (omitir herda o modelo da sessão — SDD `SKILL.md:177-179`); qual modelo, ver
    `references/model-tiers.md`. **Fica no conductor:** adjudicação **e a verificação do achado
-   que a sustenta**, os gates `verify` (F5) e Fase 6, comando determinístico de uma linha, e o
-   estado da própria sessão (worktree, modelo). Limite: `references/review-gates.md`.
+   que a sustenta**, os gates `verify` (F5) e Fase 6, comando determinístico de uma linha, os
+   artefatos que o próprio conductor vai autorar ou executar (spec da F1, plano da F3/F4), e o
+   estado da própria sessão (worktree, modelo, skills disponíveis na sessão). Limite:
+   `references/review-gates.md`.
 
 ## Workflow
 

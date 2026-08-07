@@ -73,11 +73,19 @@ fi
 grep -qF 'Escritores sempre em' "$SK" || fail "SKILL.md must state the writer model holds in both tiers"
 # Princípio 6 — o conductor coordena; investigação/coleta vão para subagentes.
 # Âncora ESTRUTURAL (o item numerado existe), não frase: sobrevive a reescrita do corpo e
-# falha se alguém deletar o princípio.
+# falha se alguém deletar o princípio. Mas só isso protege contra DELEÇÃO, não contra reescrita
+# do corpo (achado do reviewer: trocar o corpo por "6. Use tabs, nunca espaços." passava verde) —
+# por isso o assert de frase abaixo, amarrado à cláusula que faz o trabalho.
 grep -qE '^6\. ' "$SK" || fail "SKILL.md must have Princípio 6 (o conductor coordena)"
+# Assert de frase: trava a cláusula "o que fica no conductor" (adjudicação, verify/F6, artefatos
+# que ele mesmo autora, estado da sessão) — sem ela o princípio autoriza fan-out mas não diz onde
+# para. Única no SKILL.md (confirmado por `grep -cF`, ver relatório da task), sonda negativa feita.
+grep -qF 'Fica no conductor' "$SK" || fail "SKILL.md Princípio 6 must keep the conductor-retains clause"
 # O limite anti-empilhamento mora no review-gates.md e precisa nomear investigação.
 grep -qi 'investiga' "$BASE/references/review-gates.md" \
   || fail "review-gates.md must separate parallel investigation from stacked review"
-# A matriz é a fonte única do modelo do investigador (o princípio aponta pra cá).
-grep -qi 'investiga' "$MT" || fail "model-tiers.md must state the investigation agent model"
+# A matriz é a fonte única do modelo do investigador (o princípio aponta pra cá). Amarrado à
+# LINHA da matriz com Sonnet — não só à palavra "investiga" solta em qualquer lugar do arquivo.
+grep -qE '^\|.*[Ii]nvestiga.*\|.*Sonnet' "$MT" \
+  || fail "model-tiers.md must state the investigation agent model"
 echo "PASS test_references"

@@ -10,9 +10,9 @@ produz palpite com selo de "revisado" — exatamente o que o `review-gates.md` c
 não ter reviewer. Logo:
 
 - **O tier derruba camada redundante.** É o único botão.
-- **Nenhum papel troca de modelo por tier.** Escritores TDD são Sonnet por padrão; conductor,
-  staff-reviewer (Fase 2) e adjudicação são sempre Opus. O que varia entre `full` e `light` é
-  **camada** — o task-reviewer por task roda ou não roda.
+- **Nenhum papel troca de modelo por tier.** Escritores TDD e investigação/coleta (Princípio 6)
+  são Sonnet por padrão; conductor, staff-reviewer (Fase 2) e adjudicação são sempre Opus. O que
+  varia entre `full` e `light` é **camada** — o task-reviewer por task roda ou não roda.
 
 Escopo desta matriz: **camadas e modelo**. Integrações ambientes opcionais condicionadas ao tier
 (quando presentes na sessão) vivem na **Fase 0** — ver `setup-gate.md`, passo 7.
