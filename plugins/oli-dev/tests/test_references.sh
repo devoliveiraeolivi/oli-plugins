@@ -2,6 +2,7 @@
 set -eu
 HERE="$(cd "$(dirname "$0")" && pwd)"
 BASE="$HERE/../skills/dev-cycle"
+ROOT="$HERE/.."
 fail() { echo "FAIL: $1" >&2; exit 1; }
 
 for f in references/setup-gate.md references/review-gates.md references/pre-push-gate.md \
@@ -41,4 +42,23 @@ grep -qi 'pyproject\|package.json' "$BASE/references/pre-push-gate.md" || fail "
 grep -qi 'main' "$BASE/references/setup-gate.md" || fail "setup-gate.md must require branch from main"
 # Passo do ponytail por tier (opcional, fail-open) documentado na Fase 0
 grep -qi 'ponytail' "$BASE/references/setup-gate.md" || fail "setup-gate.md must document the ponytail-by-tier step"
+# Item 1 propagado — nenhum doc pode atribuir o modelo do escritor ao tier.
+# São asserts de frase porque aqui não há condição estrutural como a da matriz; cada frase
+# escolhida é uma AFIRMAÇÃO (claim), não estilo.
+SK="$BASE/SKILL.md"
+if grep -q 'downgrade de modelo' "$SK"; then
+  fail "SKILL.md still frames the writer model as a tier downgrade"
+fi
+if grep -qE 'full.=opus' "$SK"; then
+  fail "SKILL.md still pins TDD writers to Opus in the full tier"
+fi
+if grep -q 'trocam de modelo no' "$ROOT/README.md"; then
+  fail "README.md still claims the writer model changes with the tier"
+fi
+if grep -q 'escritores TDD vão pra' "$ROOT/commands/oli-dev.md"; then
+  fail "commands/oli-dev.md still frames the writer model as light-specific"
+fi
+if grep -q 'Só os escritores TDD' "$ROOT/evals/evals.json"; then
+  fail "evals.json light_tier_scope still implies the downgrade is exclusive to light"
+fi
 echo "PASS test_references"

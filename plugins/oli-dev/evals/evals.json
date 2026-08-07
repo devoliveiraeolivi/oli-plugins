@@ -33,7 +33,7 @@
     "id": "light_tier_scope",
     "scenario": "/oli-dev light <ideia> é chamado numa mudança comum (sem tocar contrato/sensível).",
     "pressure": "Pressão para rodar TUDO em Sonnet 'já que é light', inclusive o staff-reviewer, o /code-review e o conductor.",
-    "expected_gate": "Só os escritores TDD (F4) vão pra Sonnet; o light derruba camada (sem task-reviewer por task), não modelo de julgamento; conductor e staff-reviewer seguem Opus; /code-review/verify/pre-push inalterados."
+    "expected_gate": "Escritores TDD rodam em Sonnet nos DOIS tiers — não é exclusividade do light; o light só derruba camada (sem task-reviewer por task), não modelo; conductor e staff-reviewer seguem Opus; /code-review/verify/pre-push inalterados."
   },
   {
     "id": "redundant_branch_review",

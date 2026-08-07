@@ -7,7 +7,7 @@ description: Use ao construir uma feature/mudança nova no ecossistema OLI — c
 
 ## When to Use
 
-- `/oli-dev [light] <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default) ou `light` (menos camadas de review + escritores TDD em Sonnet) — ver `references/model-tiers.md`.
+- `/oli-dev [light] <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default) ou `light` (menos camadas de review) — ver `references/model-tiers.md`.
 - `/oli-dev finalize` → só a Fase 8 (close-out + limpeza), depois que a PR foi mergeada.
 - Ative também quando o usuário descreve uma feature nova e pede para "construir/implementar".
 
@@ -26,14 +26,15 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 3. **Nunca deletar branch** — nem continuar empurrando nela — sem `gh pr view <n> --json state`.
    Se a PR está `MERGED`, commits/pushes na branch viram órfãos; o hook `branch-state-guard.sh`
    bloqueia isso de forma determinística (push/commit), e a Fase 0 recusa retomar numa branch mergeada.
-4. **Um caça-bug por artefato — o tier troca camada, não modelo de julgamento.**
+4. **Um caça-bug por artefato — o tier troca camada, não modelo.**
    Passe de LLM sobre o mesmo código é o custo real do ciclo; review do review rende
    concordância e churn. Então: spec → staff-reviewer (F2); diff → `/code-review` (F5).
    **Sem review final de branch na Fase 4** — a F5 cobre o mesmo diff com fleet maior
    (override deliberado do SDD; não re-adicione). O conductor é **sempre Opus 5** (Fase 0 checa),
    e todo papel de julgamento também: staff-reviewer (F2) e adjudicação, nos dois tiers.
-   O `light` **derruba camada** (sem task-reviewer por task) e faz **um** downgrade de modelo:
-   escritores TDD → `model: "sonnet"`. `/code-review` roda fleet próprio (fora do tier).
+   O `light` **só derruba camada** (sem task-reviewer por task) — nenhum papel muda de modelo
+   por tier. Escritores TDD são sempre `model: "sonnet"`. `/code-review` roda fleet próprio
+   (fora do tier).
    Effort alto nos reviews. Ver `references/model-tiers.md`.
 5. **Não presuma o que não dá pra verificar — pergunte, se for material.** Vale em todas as fases:
    se um fato carrega o design e a fonte é memória, inferência ou "deve ser assim", pare e confirme
@@ -58,7 +59,7 @@ Carregue o `references/*.md` da fase **quando ela começa** (progressive disclos
   para aprovação manual.
 - **Fase 2 — REVIEW pré-código** → ver `references/review-gates.md`. 1 `staff-reviewer` cético, **Opus nos dois tiers**. Resolve achados. Commit.
 - **Fase 3 — PLANO** → invoca `superpowers:writing-plans`. Commit.
-- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores com `model:` por tier (`full`=opus, `light`=sonnet); task-reviewer por task só no `full`; **sem review final de branch nos dois tiers** (coberto pela Fase 5 — override deliberado do SDD). Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
+- **Fase 4 — ESCRITA** → invoca `superpowers:subagent-driven-development`; cada task em TDD. Escritores sempre em `model: "sonnet"` (nos dois tiers); task-reviewer por task só no `full`; **sem review final de branch nos dois tiers** (coberto pela Fase 5 — override deliberado do SDD). Pipeline (serial) ou Fan-out (`dispatching-parallel-agents`) conforme dependência. Checkpoint commit por task.
 - **Fase 5 — REVIEW pós-código** → ver `references/review-gates.md`. `/code-review` → `/simplify` (só se diff > ~150 linhas) → `verify` (sempre); sub-gate condicional `/security-review` se o diff toca superfície sensível. Idêntica nos dois tiers (conductor adjudica em Opus; `/code-review` tem fleet próprio).
 - **Fase 6 — PRE-PUSH gate** → ver `references/pre-push-gate.md`. Prefere `scripts/check.sh --fast` do repo; senão fallback ruff+mypy (ou lint+test+build p/ node). Bloqueia se falhar, com evidência.
 - **Fase 7 — PUSH + PR** → `commit-commands:commit-push-pr`. Base = `main`. O push leva o prefixo `OLI_DEV_GATE_OK=1` (gate já rodou na Fase 6 → hook não re-roda). Usa `assets/pr-body-template.md`. Termina aqui.

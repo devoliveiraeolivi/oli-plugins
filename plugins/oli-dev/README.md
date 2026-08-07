@@ -7,8 +7,8 @@ encadeando skills do **superpowers** com gates opinativos.
 - **superpowers** instalado (este plugin invoca suas skills). Sem ele, a skill avisa e para.
 - **Loop principal em Opus 5.** Uma skill é markdown e não troca o modelo da sessão; a Fase 0
   verifica e bloqueia até você confirmar. Todo papel de **julgamento** roda em Opus nos dois tiers
-  (conductor, staff-reviewer, adjudicação); o **tier** troca **camadas de review** — e só os
-  escritores TDD trocam de modelo no `light`.
+  (conductor, staff-reviewer, adjudicação); o **tier** troca **camadas de review** — e **nenhum**
+  papel troca de modelo por tier: escritores TDD são sempre Sonnet.
 
 ## Instalação
 ```
@@ -18,8 +18,8 @@ encadeando skills do **superpowers** com gates opinativos.
 
 ## Uso
 - `/oli-dev <ideia da feature>` → ciclo completo (Fases 0–7), termina em PR aberta. Tier `full` (default).
-- `/oli-dev light <ideia>` → tier `light`: **menos camadas** (sem task-reviewer por task) + escritores TDD
-  em **Sonnet 5**. Julgamento segue em Opus; `/code-review`/`verify`/pre-push inalterados.
+- `/oli-dev light <ideia>` → tier `light`: **menos camadas** (sem task-reviewer por task).
+  Julgamento segue em Opus; `/code-review`/`verify`/pre-push inalterados.
   Ver `skills/dev-cycle/references/model-tiers.md`.
   Com o plugin **ponytail** presente, o tier light também ativa `/ponytail lite` na Fase 0 (opcional, fail-open).
 - `/oli-dev finalize` → close-out + limpeza pós-merge (Fase 8), depois que a PR foi mergeada.
@@ -35,7 +35,7 @@ final de branch na F4 (a F5 cobre o mesmo diff com fleet maior) e o `/simplify` 
 ## Gates duros (invioláveis)
 1. Uma branch por ciclo, da `main`, sem stacked. 2. Worktree sempre, da `main`.
 3. Nunca deletar branch sem `gh pr view --json state == MERGED`. 4. Conductor e todo papel de
-julgamento sempre Opus; o tier mexe em camada, não em modelo de review.
+julgamento sempre Opus; o tier mexe em camada, não em modelo.
 
 ## Hook de pre-push
 `hooks/pre-push-gate.sh` é um backstop PreToolUse: em `git push`, detecta a stack
