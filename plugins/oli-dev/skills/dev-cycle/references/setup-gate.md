@@ -1,40 +1,50 @@
 # Fase 0 — SETUP gate
 
-1. **Modelo.** Confirme que o loop principal está em Opus 5. Skill não troca modelo: se não
-   estiver, **bloqueie** e peça `/model` (ou `/fast` no Opus). Não prossiga sem confirmação.
-2. **Dependências.** Verifique que as skills do superpowers necessárias existem
-   (brainstorming, writing-plans, subagent-driven-development, test-driven-development,
-   requesting-code-review, using-git-worktrees, finishing-a-development-branch,
-   verification-before-completion). Se faltar, avise e pare.
-   `using-git-worktrees` só é exigida no caminho de **fallback** do passo 3 (EnterWorktree nativo
-   indisponível); a ausência dela não bloqueia quando o caminho nativo existe.
-3. **Worktree (da main).** `git fetch` + garanta `main` atualizada. Crie o worktree **a partir da
-   main** — nunca de outra feature branch, nunca pasta irmã do repo. Prefira o **EnterWorktree
-   nativo** (cria em `.claude/worktrees/`, já no `.gitignore`); sem ele, fallback
-   `superpowers:using-git-worktrees` (mecânica é da skill; garanta `.worktrees/` no `.gitignore`
-   nesse caminho).
-4. **Resume/checkpoint.** Detecte artefatos: spec+plano → retome Fase 4; só spec → Fase 2/3;
-   nada → Fase 1. Anuncie de onde retoma e confirme antes de pular fases.
-5. **Guard de branch ao retomar.** Antes de retomar trabalho numa branch existente, cheque:
-   (a) estamos num **worktree linkado** (`git rev-parse --git-dir` ≠ `--git-common-dir`); e
-   (b) a PR da branch **não** está MERGED (`gh pr view <branch> --json state`). Se a branch já
-   está MERGED → **barre**: commits aqui viram órfãos (aconteceu na PR #4 → recovery na #5);
-   crie uma branch nova da `main`. Se estamos no checkout principal (sem worktree) → volte para
-   a `main` e crie o worktree. A enforcement determinística disto vive no hook
-   `hooks/branch-state-guard.sh`; este passo é a orientação correspondente.
-6. **Tier (camadas de review).** Parseie o tier (`references/model-tiers.md`): default `full`; `light` só
-   se for a 1ª palavra seguida de ideia. **Ecoe a interpretação** ("tier=X, ideia='…'") antes de
-   agir. Se `light` tocar contrato/enforcement/superfície sensível → recomende `full` e peça
-   **ack** explícito. No **resume** (spec+plano → Fase 4), leia o tier do cabeçalho do plano;
-   ausente → `full` (fallback seguro).
-7. **Ponytail por tier (opcional, fail-open).** "Disponível" = o comando `/ponytail` aparece na
-   lista de skills/comandos da sessão (o system-reminder de skills disponíveis); se a invocação
-   responder comando desconhecido/erro, trate como ausente. Ramos:
-   - **tier=`light` + disponível** → invoque `/ponytail lite` e cole o output. Sem texto capturável,
-     tente `/ponytail` sem argumento (⚠️ "reporta o nível" segundo o README do plugin — não
-     verificado localmente); se nada produzir texto, anuncie e registre na PR como `⚠️ não verificado`
-     (princípio de evidência de `review-gates.md`) — e siga.
-   - **tier=`full`** (ponytail presente ou ausente) → **não toque no ponytail** (não ligar ≠
-     desligar: se o usuário o ligou globalmente por escolha própria, o ciclo não sobrescreve).
-   - **tier=`light` + ausente** → anuncie ("ponytail ausente — seguindo sem pressão ambiente")
-     e siga. Ausência NUNCA bloqueia o ciclo.
+**Objetivo:** começar num worktree limpo criado da `main`, com o tier resolvido, sem risco de
+escrever numa branch já mergeada.
+
+## Invariantes (não negociáveis)
+
+- **Opus 5 no loop principal.** Se não estiver, **bloqueie** e peça `/model` (ou `/fast` no
+  Opus). A skill não troca modelo e não prossegue sem confirmação.
+- **Worktree criado da `main`** — nunca de outra feature branch, nunca pasta irmã do repo.
+  `git fetch` e `main` atualizada antes. Prefira o **EnterWorktree nativo** (cria em
+  `.claude/worktrees/`, já no `.gitignore`); sem ele, `superpowers:using-git-worktrees`.
+- **Guard de branch ao retomar.** Cheque as duas coisas: estamos num **worktree linkado**
+  (`git rev-parse --git-dir` ≠ `--git-common-dir`), e a PR da branch **não** está MERGED
+  (`gh pr view <branch> --json state`). Branch MERGED → **barre** e crie uma branch nova da
+  `main`; commits ali viram órfãos (aconteceu na PR #4 → recovery na #5). No checkout principal
+  sem worktree → volte para a `main` e crie o worktree. A enforcement determinística vive em
+  `hooks/branch-state-guard.sh`.
+- **Deps do superpowers presentes:** brainstorming, writing-plans, subagent-driven-development,
+  test-driven-development, requesting-code-review, finishing-a-development-branch,
+  verification-before-completion. Faltou → avise e pare. `using-git-worktrees` só é exigida no
+  fallback, quando não há EnterWorktree nativo.
+
+## Resume / checkpoint
+
+Detecte artefatos: spec + plano → Fase 4; só spec → Fase 2/3; nada → Fase 1. Anuncie de onde
+retoma e confirme **antes** de pular fase.
+
+**Plano sem cabeçalho de tier → assuma `full`** e anuncie que assumiu. Perder o tier num resume
+degrada para o lado mais seguro, nunca para o mais arriscado. Por isso a Fase 3 grava o tier.
+
+## Tier — o que ele muda, e só isso
+
+O default é enxuto. `full` soma **uma** camada: o task-reviewer por task, em Opus. Todo o resto
+é idêntico nos dois — conductor, staff-reviewer (F2) e adjudicação em **Opus**; escritores TDD
+em **Sonnet**; `/code-review`, `verify` e o pre-push gate inalterados; e nenhum review final de
+branch na Fase 4, porque a Fase 5 cobre o mesmo diff.
+
+`light` é aceito como **alias do default**, e anunciado como tal — sem ele, uma ideia que comece
+com a palavra "light" perderia a primeira palavra no parsing.
+
+**Por que o default dispensa o task-reviewer.** O SDD diz *"never skip the task review"*;
+dispensá-lo é override deliberado, e a rede que sobra é explícita: a task roda em **TDD**
+(vermelho→verde é verificação por execução, não por opinião), o `/code-review` da F5 lê o diff
+inteiro com contexto fresco, e a F6 roda lint+test de verdade. O que se perde é a **aderência à
+spec por task** — e é para isso que o `full` existe. **Recomende `full`** quando a mudança toca
+contrato, enforcement ou superfície sensível (auth, secrets, SQL/RPC, rede, cripto).
+
+**Piso de modelo: Sonnet.** Modelos mais baratos gastam 2–3× mais turnos em trabalho multi-step,
+e TDD é multi-step por natureza. Revisite só com medição.
