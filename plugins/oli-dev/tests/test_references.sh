@@ -16,6 +16,12 @@ grep -qiF 'light' "$MT" || fail "model-tiers.md must document the light tier"
 grep -qi  'conductor' "$MT" || fail "model-tiers.md must state the conductor role"
 grep -qi  'sonnet' "$MT" || fail "model-tiers.md must mention Sonnet"
 grep -qi  'opus'   "$MT" || fail "model-tiers.md must mention Opus"
+# Item 1 — nenhum papel troca de modelo por tier. Trava a CONDIÇÃO, não uma frase de prosa:
+# nenhuma linha da matriz pode ser Opus na coluna `full` e Sonnet na coluna `light`.
+# Sobrevive a reescrita do texto; falha se alguém reintroduzir um split de tier no escritor.
+if grep -qE '^\|.*\| *Opus *\|.*Sonnet' "$MT"; then
+  fail "model-tiers.md matrix still has a row that is Opus in full and Sonnet in light"
+fi
 # Review gates reference the tier matrix AND still document the Opus conductor/adjudication
 # (the honest invariant — NOT the old blanket "todos os subagentes em Opus")
 grep -qi 'tier' "$BASE/references/review-gates.md" || fail "review-gates.md must reference the model tier"

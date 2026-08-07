@@ -2,26 +2,24 @@
 
 Fonte única do tier do `/oli-dev`. Carregada na Fase 0.
 
-## Princípio: o tier troca **camadas de review**, não modelo de julgamento
+## Princípio: o tier troca **camadas de review**, não modelo
 
 O custo e a latência do ciclo vêm do **número de passes de LLM sobre o mesmo código**, não do
 modelo de cada passe. E downgrade de modelo num gate de review economiza no lugar errado:
 produz palpite com selo de "revisado" — exatamente o que o `review-gates.md` chama de pior que
 não ter reviewer. Logo:
 
-- **O tier derruba camada redundante.** É o botão principal.
-- **Um único downgrade de modelo:** os **escritores TDD** (Fase 4) no `light`. É o papel de maior
-  volume de token e o de menor exigência de julgamento — o que ele produz é verificado por
-  execução de teste, não por opinião.
-- **Todo papel de julgamento roda em Opus nos dois tiers** — conductor, staff-reviewer (Fase 2),
-  adjudicação.
+- **O tier derruba camada redundante.** É o único botão.
+- **Nenhum papel troca de modelo por tier.** Escritores TDD são sempre Sonnet; conductor,
+  staff-reviewer (Fase 2) e adjudicação são sempre Opus. O que varia entre `full` e `light` é
+  **camada** — o task-reviewer por task roda ou não roda.
 
 Escopo desta matriz: **camadas e modelo**. Integrações ambientes opcionais condicionadas ao tier
 (quando presentes na sessão) vivem na **Fase 0** — ver `setup-gate.md`, passo 7.
 
 ## Base dos dois tiers (isto não é tier — é o fluxo)
 
-Duas remoções valem igualmente em `full` e `light`:
+Três decisões valem igualmente em `full` e `light`:
 
 1. **Sem review final de branch na Fase 4.** O SDD
    (`superpowers:subagent-driven-development`) prescreve um whole-branch review no fecho — e a
@@ -31,6 +29,11 @@ Duas remoções valem igualmente em `full` e `light`:
 2. **`/simplify` condicional:** só quando o diff passa de **~150 linhas alteradas**
    (`git diff --stat` vs. `main`). Em diff pequeno ele rende churn cosmético e ainda cobra a
    adjudicação do conductor. Em dúvida, rode.
+3. **Escritores TDD sempre em Sonnet**, nos dois tiers. É o papel de maior volume de token e o
+   de menor exigência de julgamento — o que ele produz é verificado por **execução de teste**,
+   não por opinião de modelo. Quando Sonnet não dá conta, o SDD escala sozinho: fix loop
+   rodada 4+ (`SKILL.md:174-175`) e rota `BLOCKED` (`SKILL.md:244-250`).
+   ⚠️ **Premissa de design, não medição** — ver a spec, §1. Reverter custa uma célula.
 
 O que **nunca** cai, em nenhum tier: **Fase 6** (lint/test/typecheck — determinístico, zero token)
 e o **`verify`** da Fase 5. São os únicos gates que produzem verdade objetiva em vez de opinião;
@@ -42,9 +45,10 @@ foi por isso que sobreviveram ao corte.
 |---|---|---|
 | **Conductor** (F1 brainstorm · F3 plano · adjudicação · `/simplify` `verify` `/security-review` inline) | Opus | Opus |
 | **F2 — staff-reviewer** (sobre a spec) | Opus | **Opus** |
-| **F4 — escritores TDD** | Opus | **Sonnet** (`model: "sonnet"`) |
+| **F4 — escritores TDD** | **Sonnet** (`model: "sonnet"`) | **Sonnet** (`model: "sonnet"`) |
 | **F4 — task-reviewer por task** | Opus | **não roda** |
-| **F4 — fix-subagents** (só se houver achado) | Opus | Sonnet |
+| **F4 — fix loop** (SDD §4, só com achado do task-reviewer) | escritor retomado (Sonnet); rodada 4+ escala ≥1 tier acima (SDD `SKILL.md:174-175`) | **não roda** — sem task-reviewer, nada dispara |
+| **F4 — rota `BLOCKED`** (SDD `SKILL.md:244-250`, independente de review) | vale | **vale** — pode escalar modelo |
 | **F4 — review final de branch** | **não roda** (coberto pela F5) | **não roda** |
 | **F5 — `/code-review`** | fleet próprio, inalterado | inalterado |
 | **F5 — `/simplify`** | se diff > ~150 linhas | se diff > ~150 linhas |
