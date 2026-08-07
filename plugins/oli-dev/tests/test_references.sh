@@ -46,7 +46,11 @@ grep -qi 'ponytail' "$BASE/references/setup-gate.md" || fail "setup-gate.md must
 # São asserts de frase porque aqui não há condição estrutural como a da matriz; cada frase
 # escolhida é uma AFIRMAÇÃO (claim), não estilo.
 SK="$BASE/SKILL.md"
-if grep -q 'downgrade de modelo' "$SK"; then
+# 'faz .*downgrade de modelo' e 'downgrade de modelo:' pegam a CONSTRUÇÃO falsa (o `light` FAZ um
+# downgrade). Só 'downgrade de modelo' era largo demais: model-tiers.md:8 usa o substantivo de
+# forma legítima ("downgrade de modelo num gate de review economiza no lugar errado") e um SKILL.md
+# que citasse esse racional geraria falso positivo.
+if grep -qE 'faz .*downgrade de modelo|downgrade de modelo:' "$SK"; then
   fail "SKILL.md still frames the writer model as a tier downgrade"
 fi
 if grep -qE 'full.=opus' "$SK"; then
@@ -61,4 +65,8 @@ fi
 if grep -q 'Só os escritores TDD' "$ROOT/evals/evals.json"; then
   fail "evals.json light_tier_scope still implies the downgrade is exclusive to light"
 fi
+# Lado positivo: a ausência das frases acima não prova que a afirmação certa foi escrita — alguém
+# poderia apagar a frase inteira do escritor e a suíte ficaria verde do mesmo jeito. Trava a
+# presença da afirmação nova (SKILL.md:62, Fase 4).
+grep -q 'nos dois tiers' "$SK" || fail "SKILL.md must state the writer model holds in both tiers"
 echo "PASS test_references"
