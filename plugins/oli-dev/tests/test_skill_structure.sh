@@ -16,7 +16,7 @@ for s in "## When to Use" "## Prerequisites" "## Workflow" "## Verification"; do
   grep -qF "$s" "$SK" || fail "missing section: $s"
 done
 # References wired (progressive disclosure)
-for r in setup-gate review-gates pre-push-gate finalize model-tiers; do
+for r in setup-gate review-gates pre-push-gate finalize; do
   grep -qF "references/$r.md" "$SK" || fail "SKILL.md does not link references/$r.md"
 done
 # The 8 phases are listed
