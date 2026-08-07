@@ -46,6 +46,15 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
    existentes nunca se inferem de nome de campo. E todo SQL que altera schema ou dados
    (DDL, migration, backfill) vai como bloco explícito para o usuário rodar/aprovar
    manualmente; a skill não executa SQL por conta própria.
+6. **O conductor coordena — investigação e coleta de dados vão para subagentes, paralelos
+   quando independentes.** O contexto do conductor é o recurso escasso do ciclo: gastá-lo lendo
+   N arquivos é gastar o que decide. Antes de investigar, pergunte se dá pra despachar; antes de
+   despachar 2+, se são independentes — se forem, **fan-out numa mensagem só**. O investigador
+   volta com **fonte (`arquivo:linha`), não com conselho**, e é despachado com `model:`
+   **explícito** (omitir herda o modelo da sessão — SDD `SKILL.md:177-179`); qual modelo, ver
+   `references/model-tiers.md`. **Fica no conductor:** adjudicação **e a verificação do achado
+   que a sustenta**, os gates `verify` (F5) e Fase 6, comando determinístico de uma linha, e o
+   estado da própria sessão (worktree, modelo). Limite: `references/review-gates.md`.
 
 ## Workflow
 

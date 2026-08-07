@@ -10,7 +10,7 @@ PYTHON="$(command -v python3 || command -v python)" || { echo "FAIL: no python i
 import json, sys
 data = json.load(open(sys.argv[1]))
 assert isinstance(data, list) and len(data) >= 5, "need >=5 scenarios"
-need = {"skip_precode_review","non_opus_main","broken_test_push","finalize_unmerged","resume_from_spec"}
+need = {"skip_precode_review","non_opus_main","broken_test_push","finalize_unmerged","resume_from_spec","investigacao_disfarcada_de_review"}
 ids = {s["id"] for s in data}
 missing = need - ids
 assert not missing, f"missing scenarios: {missing}"

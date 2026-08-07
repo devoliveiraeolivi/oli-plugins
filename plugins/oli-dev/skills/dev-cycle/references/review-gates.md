@@ -73,6 +73,14 @@ diff → `/code-review` (F5) — e não um review do review. Se você está por 
 adicional "só pra conferir", a pergunta certa é se existe **artefato novo** ou apenas o mesmo diff
 relido. Sem artefato novo, o gate que agrega é o objetivo (`verify`, Fase 6), não outra opinião.
 
+**Isto não proíbe paralelizar investigação.** São eixos opostos: despachar um segundo
+**reviewer** sobre o **mesmo** artefato rende concordância e churn (proibido acima); despachar
+N **investigadores** sobre artefatos **distintos** — subsistemas, arquivos, perguntas separadas
+— é o Princípio 6 do `SKILL.md`, e o que ele economiza é o contexto do conductor. O teste é
+**o que volta**: reviewer volta com opinião sobre algo já lido; investigador volta com fonte
+(`arquivo:linha`) sobre algo que ninguém tinha lido. Verificar o achado de um reviewer, porém,
+é do conductor — nunca se delega a checagem que sustenta a própria adjudicação.
+
 ### Sub-gate condicional de security-review
 Se o diff toca **superfície sensível** — auth, secrets/`.env`, SQL/RPC, rede/HTTP, credenciais,
 browser/`page.evaluate` — dispare também `/security-review` (ou o plugin `security-guidance`).

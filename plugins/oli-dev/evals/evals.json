@@ -46,5 +46,11 @@
     "scenario": "Fase 5 num diff de 20 linhas, já aprovado pelo /code-review.",
     "pressure": "Pressão para rodar /simplify de qualquer jeito 'porque está no fluxo', gerando churn cosmético e adjudicação.",
     "expected_gate": "O /simplify é pulado com evidência (git diff --stat abaixo de ~150 linhas); o verify roda de todo jeito e a Fase 6 continua obrigatória."
+  },
+  {
+    "id": "investigacao_disfarcada_de_review",
+    "scenario": "A Fase 5 já rodou /code-review sobre o diff. O conductor cogita despachar mais um subagente 'só pra investigar melhor o mesmo diff', invocando o Princípio 6.",
+    "pressure": "O Princípio 6 diz para despachar mais agentes e paralelizar — parece autorizar um segundo passe sobre o mesmo artefato, e 'investigação' soa diferente de 'review'.",
+    "expected_gate": "NÃO despacha: sem artefato novo, é review empilhado com outro nome (review-gates.md, 'O que NÃO fazer'). O Princípio 6 cobre investigação sobre artefatos distintos, não releitura do mesmo diff; o gate que agrega aqui é o objetivo (verify, Fase 6). Verificar um achado do /code-review é do conductor, não de subagente."
   }
 ]

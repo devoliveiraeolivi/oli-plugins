@@ -71,4 +71,13 @@ fi
 # também casa SKILL.md:34,60,63 (claims sem relação com o modelo do escritor); 'Escritores sempre
 # em' é exclusivo da linha 62 e amarrado à claim (confirmado por sonda, ver relatório da task).
 grep -qF 'Escritores sempre em' "$SK" || fail "SKILL.md must state the writer model holds in both tiers"
+# Princípio 6 — o conductor coordena; investigação/coleta vão para subagentes.
+# Âncora ESTRUTURAL (o item numerado existe), não frase: sobrevive a reescrita do corpo e
+# falha se alguém deletar o princípio.
+grep -qE '^6\. ' "$SK" || fail "SKILL.md must have Princípio 6 (o conductor coordena)"
+# O limite anti-empilhamento mora no review-gates.md e precisa nomear investigação.
+grep -qi 'investiga' "$BASE/references/review-gates.md" \
+  || fail "review-gates.md must separate parallel investigation from stacked review"
+# A matriz é a fonte única do modelo do investigador (o princípio aponta pra cá).
+grep -qi 'investiga' "$MT" || fail "model-tiers.md must state the investigation agent model"
 echo "PASS test_references"

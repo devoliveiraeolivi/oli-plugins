@@ -47,6 +47,7 @@ foi por isso que sobreviveram ao corte.
 | Papel / camada | `full` (default) | `light` |
 |---|---|---|
 | **Conductor** (F1 brainstorm · F3 plano · adjudicação · `/simplify` `verify` `/security-review` inline) | Opus | Opus |
+| **Investigação / coleta** (qualquer fase — Princípio 6) | Sonnet | Sonnet |
 | **F2 — staff-reviewer** (sobre a spec) | Opus | **Opus** |
 | **F4 — escritores TDD** | **Sonnet** (`model: "sonnet"`) | **Sonnet** (`model: "sonnet"`) |
 | **F4 — task-reviewer por task** | Opus | **não roda** |
