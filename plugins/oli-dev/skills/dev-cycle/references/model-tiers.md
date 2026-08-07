@@ -10,14 +10,14 @@ produz palpite com selo de "revisado" — exatamente o que o `review-gates.md` c
 não ter reviewer. Logo:
 
 - **O tier derruba camada redundante.** É o único botão.
-- **Nenhum papel troca de modelo por tier.** Escritores TDD são sempre Sonnet; conductor,
+- **Nenhum papel troca de modelo por tier.** Escritores TDD são Sonnet por padrão; conductor,
   staff-reviewer (Fase 2) e adjudicação são sempre Opus. O que varia entre `full` e `light` é
   **camada** — o task-reviewer por task roda ou não roda.
 
 Escopo desta matriz: **camadas e modelo**. Integrações ambientes opcionais condicionadas ao tier
 (quando presentes na sessão) vivem na **Fase 0** — ver `setup-gate.md`, passo 7.
 
-## Base dos dois tiers (isto não é tier — é o fluxo)
+## Base dos dois tiers (isto não é tier — é o fluxo e o modelo)
 
 Três decisões valem igualmente em `full` e `light`:
 
@@ -32,8 +32,11 @@ Três decisões valem igualmente em `full` e `light`:
 3. **Escritores TDD sempre em Sonnet**, nos dois tiers. É o papel de maior volume de token e o
    de menor exigência de julgamento — o que ele produz é verificado por **execução de teste**,
    não por opinião de modelo. Quando Sonnet não dá conta, o SDD escala sozinho: fix loop
-   rodada 4+ (`SKILL.md:174-175`) e rota `BLOCKED` (`SKILL.md:244-250`).
-   ⚠️ **Premissa de design, não medição** — ver a spec, §1. Reverter custa uma célula.
+   rodada 4+ (`subagent-driven-development/SKILL.md:174-175`) e rota `BLOCKED`
+   (`subagent-driven-development/SKILL.md:244-250`).
+   ⚠️ **Premissa de design, não medição** — ver
+   `docs/superpowers/specs/2026-08-07-oli-dev-opus-julga-sonnet-produz-design.md`, §1. Reverter
+   custa uma célula.
 
 O que **nunca** cai, em nenhum tier: **Fase 6** (lint/test/typecheck — determinístico, zero token)
 e o **`verify`** da Fase 5. São os únicos gates que produzem verdade objetiva em vez de opinião;
@@ -47,8 +50,8 @@ foi por isso que sobreviveram ao corte.
 | **F2 — staff-reviewer** (sobre a spec) | Opus | **Opus** |
 | **F4 — escritores TDD** | **Sonnet** (`model: "sonnet"`) | **Sonnet** (`model: "sonnet"`) |
 | **F4 — task-reviewer por task** | Opus | **não roda** |
-| **F4 — fix loop** (SDD §4, só com achado do task-reviewer) | escritor retomado (Sonnet); rodada 4+ escala ≥1 tier acima (SDD `SKILL.md:174-175`) | **não roda** — sem task-reviewer, nada dispara |
-| **F4 — rota `BLOCKED`** (SDD `SKILL.md:244-250`, independente de review) | vale | **vale** — pode escalar modelo |
+| **F4 — fix loop** (SDD §4) | 1-3: retoma escritor; 4-5: fresco ≥1 tier; teto 5 (`subagent-driven-development/SKILL.md:174-175,320,328`) | **não roda** |
+| **F4 — rota `BLOCKED`** (SDD `subagent-driven-development/SKILL.md:244-250`, indep. de review) | vale | **vale** — pode escalar modelo |
 | **F4 — review final de branch** | **não roda** (coberto pela F5) | **não roda** |
 | **F5 — `/code-review`** | fleet próprio, inalterado | inalterado |
 | **F5 — `/simplify`** | se diff > ~150 linhas | se diff > ~150 linhas |
@@ -68,7 +71,7 @@ deliberado, nunca default.
 ### Fora dos tiers por decisão (não por limitação): Haiku
 A guidance do SDD permite o tier mais barato p/ fixes de 1 arquivo e implementação-transcrição,
 mas avisa que modelos mais baratos gastam 2–3× mais turnos em trabalho multi-step — e TDD é
-multi-step por natureza. O piso do `light` é Sonnet; revisite só com medição.
+multi-step por natureza. O piso é Sonnet nos dois tiers; revisite só com medição.
 
 ## Invocação e parsing
 

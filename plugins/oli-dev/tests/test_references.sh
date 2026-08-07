@@ -19,7 +19,9 @@ grep -qi  'opus'   "$MT" || fail "model-tiers.md must mention Opus"
 # Item 1 — nenhum papel troca de modelo por tier. Trava a CONDIÇÃO, não uma frase de prosa:
 # nenhuma linha da matriz pode ser Opus na coluna `full` e Sonnet na coluna `light`.
 # Sobrevive a reescrita do texto; falha se alguém reintroduzir um split de tier no escritor.
-if grep -qE '^\|.*\| *Opus *\|.*Sonnet' "$MT"; then
+# \**Opus\** e [^|]* cobrem negrito e sufixo (ex.: "**Opus**", "Opus (`model: \"opus\"`)") —
+# a forma nua "Opus" sem essas variações escapava do regex original.
+if grep -qE '^\|.*\| *\**Opus\**[^|]*\|[^|]*Sonnet' "$MT"; then
   fail "model-tiers.md matrix still has a row that is Opus in full and Sonnet in light"
 fi
 # Review gates reference the tier matrix AND still document the Opus conductor/adjudication
