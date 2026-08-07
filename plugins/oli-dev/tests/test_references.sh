@@ -81,6 +81,15 @@ grep -qE '^6\. ' "$SK" || fail "SKILL.md must have Princípio 6 (o conductor coo
 # que ele mesmo autora, estado da sessão) — sem ela o princípio autoriza fan-out mas não diz onde
 # para. Única no SKILL.md (confirmado por `grep -cF`, ver relatório da task), sonda negativa feita.
 grep -qF 'Fica no conductor' "$SK" || fail "SKILL.md Princípio 6 must keep the conductor-retains clause"
+# Achado da rodada 2 (re-review): 'Fica no conductor' trava só a ETIQUETA da cláusula — o
+# conteúdo depois dos dois-pontos podia virar "nada em especial, tudo pode ser delegado." e a
+# suíte continuava verde. Assert amarrado ao conteúdo mais load-bearing dentro da cláusula: a
+# menção a Fase 6, o gate que model-tiers.md diz que NUNCA cai em nenhum tier — se a cláusula for
+# esvaziada, essa menção some junto. Sem backtick no padrão (evita SC2016 do shellcheck: backtick
+# em single-quote lê como tentativa de expansão). Única no SKILL.md (`grep -c` = 1, ver
+# relatório), sonda de evisceração feita.
+grep -qF 'e Fase 6, comando determinístico de uma linha' "$SK" \
+  || fail "SKILL.md Princípio 6 conductor-retains clause must still name the two never-skip gates"
 # O limite anti-empilhamento mora no review-gates.md e precisa nomear investigação.
 grep -qi 'investiga' "$BASE/references/review-gates.md" \
   || fail "review-gates.md must separate parallel investigation from stacked review"
