@@ -7,8 +7,8 @@ encadeando skills do **superpowers** com gates opinativos.
 - **superpowers** instalado (este plugin invoca suas skills). Sem ele, a skill avisa e para.
 - **Loop principal em Opus 5.** Uma skill é markdown e não troca o modelo da sessão; a Fase 0
   verifica e bloqueia até você confirmar. Todo papel de **julgamento** roda em Opus em ambos
-  (conductor, staff-reviewer, adjudicação); o **tier** troca **camadas de review** — e só os
-  escritores TDD trocam de modelo no default enxuto.
+  (conductor, staff-reviewer, adjudicação); o **tier** troca **camadas de review**, não modelo —
+  os escritores TDD rodam em Sonnet nos dois.
 
 ## Instalação
 ```

@@ -3,8 +3,7 @@
 ## Princípio inviolável — evidência ou abstenha
 
 Um reviewer que **afirma sem checar** é **pior que não ter reviewer**: lava um palpite em "fato
-revisado" que ninguém mais questiona. Vale pro staff-reviewer (F2), pros gates da F5 e pro
-conductor.
+revisado" que ninguém mais questiona.
 
 - **Achado sem evidência citada** (`file:line`, ou comando + saída real) não é finding: é
   palpite → rotule **`⚠️ não verificado`**.
@@ -26,32 +25,27 @@ Idêntica nos dois tiers. `/code-review` roda seu fleet próprio; o resto roda n
 conductor (**Opus 5**), que adjudica.
 
 1. `/code-review` (effort alto) — bugs de correção; verifique os achados adversarialmente. É o
-   **único caça-bug de contexto fresco sobre o diff inteiro**, e substitui o whole-branch review
-   que o SDD faria no fecho da Fase 4, em vez de repeti-lo.
+   **único caça-bug de contexto fresco sobre o diff inteiro**, e o que substitui o branch review.
 2. `/simplify` — só se o diff passa de **~150 linhas alteradas** (`git diff --stat` vs. `main`).
-   Em diff pequeno rende churn cosmético e ainda cobra a adjudicação. Em dúvida, rode.
+   Em diff pequeno rende churn cosmético e ainda cobra a adjudicação. Em dúvida, rode. **Se
+   pular, cole o `git diff --stat`** — o motivo é o tamanho, e tamanho se mostra.
 3. `verify` (`superpowers:verification-before-completion`) roda **sempre** — qualquer tier,
-   qualquer tamanho de diff. Testes e app de verdade, com evidência colada.
+   qualquer diff. Testes de verdade, evidência colada, sobre o resultado já simplificado.
 
-A ordem sai daí, não de decreto: não se simplifica código com bug em aberto, e o `verify`
-precisa validar o resultado **já** simplificado.
+A ordem não é decreto: não se simplifica código com bug em aberto.
 
 **O `/simplify` propõe; o conductor adjudica.** Concisão que remove tratamento, caso de borda ou
-correção é regressão disfarçada de limpeza — e o simplify erra para o lado da concisão. Em
-dúvida, não simplifique. O gate duro é o `verify`: "quality only, não caça bug" ≠ "não pode
-causar bug".
+correção é regressão disfarçada de limpeza — em dúvida, não simplifique. O gate duro é o `verify`.
 
-**Sem buracos temporários.** TODO, stub, `pass`, mock no lugar de lógica: vira dívida silenciosa
-e nunca sai. Achado pequeno conserta agora, completo. O que genuinamente não cabe neste ciclo
-vira registro visível (issue, `docs/project_notes`), não um `# TODO` perdido no diff.
+**Sem buracos temporários.** TODO, stub, `pass`, mock no lugar de lógica: achado pequeno conserta
+agora, completo; o que não cabe no ciclo vira registro visível (issue, `docs/project_notes`).
 
 ## O que NÃO fazer: empilhar review sobre review
 
-Depois do primeiro reviewer de contexto fresco o retorno cai rápido: o segundo relê o mesmo
-código com o mesmo prior e rende concordância e churn. Antes de despachar um reviewer "só pra
-conferir", pergunte se existe **artefato novo que nenhum gate já cobriu** — fatiar um diff já
-revisado em 3 arquivos e chamar cada pedaço de "artefato distinto" é o mesmo empilhamento com
-outro nome. Sem artefato novo, o gate que agrega é o objetivo (`verify`, Fase 6).
+Antes de despachar um reviewer "só pra conferir", pergunte se existe **artefato novo que nenhum
+gate já cobriu** — fatiar um diff já revisado em 3 arquivos e chamar cada pedaço de "artefato
+distinto" é o mesmo empilhamento com outro nome. Sem artefato novo, o gate que agrega é o
+objetivo (`verify`, Fase 6), não outra opinião.
 
 ### Sub-gate condicional de security-review
 Diff que toca **superfície sensível** — auth, secrets/`.env`, SQL/RPC, rede/HTTP, credenciais,

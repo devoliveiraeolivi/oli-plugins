@@ -69,13 +69,20 @@ a célula morta (`:47`, ver D6.1).
 aderência-à-spec por task — que `model-tiers.md:61-62` nomeia como a única coisa que se
 perde sem o task-reviewer, e que erra caro em contrato/enforcement/superfície sensível.
 
-`light` continua parseando por compatibilidade. Sem isso, uma ideia que comece com a
-palavra "light" é interpretada como tier e perde a primeira palavra.
-(`test_skill_structure.sh:28-30` também exige os dois tokens no command file — segue verde.)
+`light` continua parseando por compatibilidade, e `test_skill_structure.sh:28-30` exige os
+dois tokens no command file. ⚠️ **Corrigido após o `/code-review` da Fase 5:** a justificativa
+original ("sem o alias, uma ideia que comece com 'light' perde a primeira palavra") estava
+**invertida**. É aceitar `light` como token de tier que faz `/oli-dev light mode toggle` virar
+ideia `"mode toggle"`. A mitigação é o **eco da interpretação** (*"tier=X, ideia='…'"*), que eu
+havia cortado como roteiro — é gate, porque torna visível um parse com perda. Restaurado.
 
-O **piso de segurança** (hoje 10 linhas em `model-tiers.md:91-100`) vira uma linha: mudança
-que toca contrato/enforcement/superfície sensível → recomende `full`. Não precisa mais de
-ack, porque o caminho arriscado deixou de ser o default.
+O **piso de segurança** (hoje 10 linhas em `model-tiers.md:91-100`) encolhe, mas **mantém o
+ack**. ⚠️ **Corrigido após o `/code-review`:** a versão anterior desta spec dizia "não precisa
+mais de ack, porque o caminho arriscado deixou de ser o default" — raciocínio de cabeça pra
+baixo. Antes, `full` era o default e mudança sensível já caía no caminho seguro; o ack existia
+para *sair* dele. Agora o default é enxuto, então uma mudança de auth/secrets/SQL roda sem
+aderência-à-spec por task **sem ninguém digitar nada**. O ack ficou mais necessário, não menos:
+superfície sensível → recomende `full` e peça ack antes de seguir no default.
 
 **D2.1 — o fallback do resume continua fail-safe.** `model-tiers.md:104-108` estabelece que
 perder o tier num resume "degrada para `full`, nunca para algo mais arriscado". Depois da

@@ -8,8 +8,7 @@ description: Use ao construir uma feature/mudança nova no ecossistema OLI — c
 ## When to Use
 
 - `/oli-dev <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Default enxuto.
-- `/oli-dev full <ideia>` → soma o task-reviewer por task: contrato, enforcement ou superfície
-  sensível. Ver `references/setup-gate.md`.
+- `/oli-dev full <ideia>` → soma o task-reviewer por task (`references/setup-gate.md`).
 - `/oli-dev finalize` → só a Fase 8 (close-out + limpeza), depois da PR mergeada.
 - Ative também quando o usuário descreve uma feature nova e pede para construir/implementar.
 
@@ -17,17 +16,16 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 
 ## Prerequisites
 
-- Plugin **superpowers** instalado (esta skill o invoca). Se faltar, avise e pare.
-- Loop principal em **Opus 5** (verificado na Fase 0).
-- Repo alvo é um git repo com `main` e remoto configurado.
+- Plugin **superpowers** instalado (esta skill o invoca); repo alvo com `main` e remoto.
+- Loop principal em **Opus 5**. A Fase 0 verifica os dois e para se faltar.
 
 ## Princípios de processo (gates duros — invioláveis)
 
 1. Uma branch por ciclo, **da `main`**. Sem PRs stacked por padrão.
 2. **Worktree sempre, da `main`.** Nunca trabalhar direto numa branch no dir principal.
 3. **Nunca deletar branch** — nem seguir empurrando nela — sem `gh pr view <n> --json state`.
-   PR `MERGED` → commits e pushes ali viram órfãos. O hook `branch-state-guard.sh` bloqueia
-   isso de forma determinística; a Fase 0 recusa retomar numa branch mergeada.
+   PR `MERGED` → commits ali viram órfãos. O hook `branch-state-guard.sh` bloqueia; a Fase 0
+   recusa retomar numa branch mergeada.
 4. **Um caça-bug por artefato.** Passe de LLM sobre o mesmo código é o custo real do ciclo, e
    review do review rende concordância e churn. Spec → staff-reviewer (F2); diff →
    `/code-review` (F5). **Sem review final de branch na Fase 4** — a F5 cobre o mesmo diff
@@ -37,10 +35,10 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
    design e vem de memória ou inferência: pare e confirme. Fonte verificada = arquivo:linha,
    output de comando, doc do `oli-platform`, ou o usuário. Premissa barata de reverter: assuma,
    registre na spec e siga. **Banco nunca se infere** — schema, tabelas, RPCs e policies se
-   checam; e todo SQL que altera schema ou dados vai como bloco para o usuário rodar
-   manualmente, a skill não executa SQL.
-6. **O conductor coordena.** Investigação, coleta e teste vão para subagentes — paralelos
-   quando independentes.
+   checam; e todo SQL de schema ou dados vai como bloco para o usuário rodar, não executado aqui.
+6. **O conductor coordena.** Investigação, coleta e teste vão para subagentes — paralelos quando
+   independentes. Exceção: gate cuja evidência é o output em si (Fase 6, `verify`) o conductor
+   roda e cola — evidência de primeira mão não se delega.
 
 ## Workflow
 
@@ -57,9 +55,8 @@ Um todo por fase. Modo `<ideia>` = Fases 0–7; modo `finalize` = Fase 8. Carreg
   com `model: "sonnet"`. Task-reviewer por task só no `full`. Checkpoint commit por task.
 - **Fase 5 — REVIEW pós-código** → `references/review-gates.md`.
 - **Fase 6 — PRE-PUSH gate** → `references/pre-push-gate.md`. Bloqueia se falhar, com evidência.
-- **Fase 7 — PUSH + PR** → `commit-commands:commit-push-pr`. Base = `main`; o push leva o
-  prefixo `OLI_DEV_GATE_OK=1` (o gate já rodou na F6, o hook não re-roda). Usa
-  `assets/pr-body-template.md`. Termina aqui.
+- **Fase 7 — PUSH + PR** → `commit-commands:commit-push-pr`. Base = `main`; o push leva o prefixo
+  `OLI_DEV_GATE_OK=1` (o gate já rodou na F6). Usa `assets/pr-body-template.md`. Termina aqui.
 - **Fase 8 — FINALIZE** (`/oli-dev finalize`) → `references/finalize.md`.
 
 ## Verification

@@ -15,11 +15,13 @@ Invoque a skill `dev-cycle` (plugin oli-dev) e siga-a à risca. Faça o parsing 
 3. Senão → tier não informado (default **enxuto**, equivalente a `light`); toda a `$ARGUMENTS` é a
    ideia → modo **ciclo**.
 
-O tier troca **camadas de review**, não modelo de julgamento: o `default não roda task-reviewer`
-por task — a Fase 5 cobre o mesmo diff com contexto fresco — e os escritores TDD vão pra
-`model: "sonnet"`. `full` readiciona o task-reviewer por task (Fase 4) para contrato/enforcement/
-superfície sensível. Conductor, staff-reviewer (Fase 2) e adjudicação seguem em Opus em ambos;
-`/code-review`, `verify` e o pre-push gate inalterados.
+O tier troca **camadas de review**, não modelo: o **default não roda task-reviewer** por task —
+a Fase 5 cobre o mesmo diff com contexto fresco. `full` readiciona essa camada, para
+contrato/enforcement/superfície sensível; nesse caso **peça ack explícito** antes de seguir no
+default. Escritores TDD em `model: "sonnet"` nos dois. Conductor, staff-reviewer (Fase 2) e
+adjudicação seguem em Opus em ambos; `/code-review`, `verify` e o pre-push gate inalterados.
+Ao reconhecer `light`/`full` como 1ª palavra, **ecoe** *"tier=X, ideia='…'"* — o token some da
+ideia, e truncar em silêncio é o modo de falha.
 Em ambos: **sem review final de branch** na Fase 4 (a Fase 5 cobre o mesmo diff) e `/simplify`
 só se o diff passa de ~150 linhas. Detalhes: `references/setup-gate.md`.
 

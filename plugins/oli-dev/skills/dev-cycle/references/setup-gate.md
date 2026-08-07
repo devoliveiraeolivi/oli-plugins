@@ -31,20 +31,20 @@ degrada para o lado mais seguro, nunca para o mais arriscado. Por isso a Fase 3 
 
 ## Tier — o que ele muda, e só isso
 
-O default é enxuto. `full` soma **uma** camada: o task-reviewer por task, em Opus. Todo o resto
-é idêntico nos dois — conductor, staff-reviewer (F2) e adjudicação em **Opus**; escritores TDD
-em **Sonnet**; `/code-review`, `verify` e o pre-push gate inalterados; e nenhum review final de
-branch na Fase 4, porque a Fase 5 cobre o mesmo diff.
+O default é enxuto. `full` soma **uma** camada: o task-reviewer por task, em Opus. **Nada mais
+muda** — nenhum papel, nenhum modelo, nenhum gate. Escritores TDD em **Sonnet** nos dois.
 
-`light` é aceito como **alias do default**, e anunciado como tal — sem ele, uma ideia que comece
-com a palavra "light" perderia a primeira palavra no parsing.
+`light` é aceito como **alias do default**, por compatibilidade. Cuidado: aceitar `light` como
+token de tier é justamente o que faz `/oli-dev light mode toggle` virar ideia `"mode toggle"`.
+Por isso, **ecoe a interpretação** — *"tier=X, ideia='…'"* — sempre que a 1ª palavra for `light`
+ou `full`. Truncar em silêncio é o modo de falha; o eco o torna visível.
 
-**Por que o default dispensa o task-reviewer.** O SDD diz *"never skip the task review"*;
-dispensá-lo é override deliberado, e a rede que sobra é explícita: a task roda em **TDD**
-(vermelho→verde é verificação por execução, não por opinião), o `/code-review` da F5 lê o diff
-inteiro com contexto fresco, e a F6 roda lint+test de verdade. O que se perde é a **aderência à
-spec por task** — e é para isso que o `full` existe. **Recomende `full`** quando a mudança toca
-contrato, enforcement ou superfície sensível (auth, secrets, SQL/RPC, rede, cripto).
+O SDD diz *"never skip the task review"*; dispensá-lo no default é **override deliberado**. A
+rede que sobra: TDD, `/code-review` (F5), F6. O `full` recupera a aderência-à-spec por task.
 
-**Piso de modelo: Sonnet.** Modelos mais baratos gastam 2–3× mais turnos em trabalho multi-step,
-e TDD é multi-step por natureza. Revisite só com medição.
+**Piso de segurança (gate, não sugestão).** Mudança que toca contrato, enforcement ou superfície
+sensível (auth, secrets, SQL/RPC, rede, cripto): recomende `full` e **peça ack explícito** antes
+de seguir no default. Com o default enxuto, ninguém digita nada para cair no caminho sem
+task-reviewer — sem o ack, uma mudança de auth roda sem aderência-à-spec por task e em silêncio.
+
+**Piso de modelo: Sonnet.** Mais barato gasta 2–3× mais turnos em multi-step, e TDD é multi-step.
