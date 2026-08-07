@@ -67,6 +67,8 @@ if grep -q 'Só os escritores TDD' "$ROOT/evals/evals.json"; then
 fi
 # Lado positivo: a ausência das frases acima não prova que a afirmação certa foi escrita — alguém
 # poderia apagar a frase inteira do escritor e a suíte ficaria verde do mesmo jeito. Trava a
-# presença da afirmação nova (SKILL.md:62, Fase 4).
-grep -q 'nos dois tiers' "$SK" || fail "SKILL.md must state the writer model holds in both tiers"
+# presença da afirmação nova (SKILL.md:62, Fase 4). 'nos dois tiers' sozinho era largo demais —
+# também casa SKILL.md:34,60,63 (claims sem relação com o modelo do escritor); 'Escritores sempre
+# em' é exclusivo da linha 62 e amarrado à claim (confirmado por sonda, ver relatório da task).
+grep -qF 'Escritores sempre em' "$SK" || fail "SKILL.md must state the writer model holds in both tiers"
 echo "PASS test_references"
