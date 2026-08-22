@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Conhecimento Tributário"
+  short_description: "Audite ações tributárias judiciais por rito e natureza"
+  default_prompt: "Use $preaprovar-conhecimento-tributario para auditar as ações tributárias de conhecimento pendentes."

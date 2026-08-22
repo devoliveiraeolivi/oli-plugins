@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Processos Administrativos"
+  short_description: "Audite processos administrativos antes da aprovação"
+  default_prompt: "Use $preaprovar-processos-administrativos para revisar os processos administrativos pendentes antes da minha aprovação."

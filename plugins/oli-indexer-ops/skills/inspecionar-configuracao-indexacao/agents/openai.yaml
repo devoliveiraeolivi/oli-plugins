@@ -1,0 +1,4 @@
+interface:
+  display_name: "Inspecionar Configuração da Indexação"
+  short_description: "Rastreie prompts, grafos, taxonomia e análises"
+  default_prompt: "Use $inspecionar-configuracao-indexacao para explicar quais prompts e analyzers produziram este job."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Consultar OLI Indexer"
+  short_description: "Navegue com segurança pelos bancos do indexador"
+  default_prompt: "Use $consultar-oli-indexer para inspecionar este job sem alterar o banco."

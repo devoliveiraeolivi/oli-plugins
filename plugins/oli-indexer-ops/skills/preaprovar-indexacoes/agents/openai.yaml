@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Indexações"
+  short_description: "Aplique o protocolo comum antes da aprovação humana"
+  default_prompt: "Use $preaprovar-indexacoes para auditar este job com a régua comum e a especialização do perfil."

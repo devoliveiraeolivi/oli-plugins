@@ -1,0 +1,35 @@
+{
+  "name": "oli-indexer-ops",
+  "version": "0.1.0",
+  "description": "Operate, trace, and pre-approve OLI Indexer jobs with shared controls and specialized tax-process review skills.",
+  "author": {
+    "name": "Cesar Batista"
+  },
+  "homepage": "https://github.com/devoliveiraeolivi/oli-plugins/tree/main/plugins/oli-indexer-ops",
+  "repository": "https://github.com/devoliveiraeolivi/oli-plugins",
+  "license": "MIT",
+  "keywords": [
+    "oli-indexer",
+    "legal-operations",
+    "pre-approval",
+    "audit"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "OLI Indexer Operations",
+    "shortDescription": "Run, inspect, and pre-approve indexing jobs.",
+    "longDescription": "Navigate OLI Indexer data, trace prompts, graphs, taxonomies and analyzers, execute jobs with cost controls, and produce versioned pre-approval reports for every supported tax-process profile without replacing human approval.",
+    "developerName": "Cesar Batista",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Analysis"
+    ],
+    "defaultPrompt": [
+      "Pre-approve pending tax-process jobs by process class.",
+      "Inspect this job and propose a versioned correction patch.",
+      "Run the requested job and prepare its pre-approval."
+    ]
+  }
+}
