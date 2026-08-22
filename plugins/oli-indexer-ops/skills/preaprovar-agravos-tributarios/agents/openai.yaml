@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar agravos tributários"
+  short_description: "Audita agravos de instrumento tributários"
+  default_prompt: "Use $preaprovar-agravos-tributarios para auditar em modo somente leitura os agravos tributários aguardando aprovação."

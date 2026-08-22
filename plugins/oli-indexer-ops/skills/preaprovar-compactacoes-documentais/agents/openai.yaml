@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Compactações"
+  short_description: "Audite grupos fiscais compactados sem ler milhares de NFs"
+  default_prompt: "Use $preaprovar-compactacoes-documentais junto da régua do perfil para auditar este job compactado."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar restituições tributárias"
+  short_description: "Audita restituições tributárias judiciais"
+  default_prompt: "Use $preaprovar-restituicoes-tributarias para auditar em modo somente leitura as restituições tributárias aguardando aprovação."

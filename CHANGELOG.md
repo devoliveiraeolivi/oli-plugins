@@ -3,6 +3,24 @@
 Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 (ver [policies/SEMVER.md](policies/SEMVER.md)).
 
+## oli-indexer-ops
+
+### [Unreleased]
+
+#### Added
+
+- Primeira fonte versionada do plugin Codex de operações do `oli-indexer`, com
+  12 skills para consulta segura, rastreabilidade de configuração, execução
+  monitorada e pré-aprovação especializada de processos tributários.
+- Protocolo comum repair-first: publica correções determinísticas como patches
+  imutáveis para revisão/aplicação no `oli-app`; aplicação direta continua
+  exigindo autorização explícita separada e nunca aprova o job.
+- Regras aprendidas em auditoria real para não confundir etapa terminal ainda
+  pendente com quebra causal, separar revisão secundária do parecer material,
+  e rotear agravos e produção antecipada de provas pela especialização correta.
+- Marketplace Codex do repositório em `.agents/plugins/marketplace.json` e
+  teste determinístico do detector de cadeias processuais incompletas.
+
 ## oli-dev
 
 ### [Unreleased]
