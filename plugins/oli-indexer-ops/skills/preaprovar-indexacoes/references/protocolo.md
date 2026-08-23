@@ -27,6 +27,10 @@ Não presuma que o arquivo local foi o prompt usado. Compare `OPS.llm_runs.templ
 Em todas as indexações, confira identidade, intervalo, data, tripla taxonômica, título, resumo, função/nome responsável, referência processual, resultado, resultado do cliente e status de validação.
 
 - Meça páginas do escopo, lacunas, sobreposições incompatíveis, duplicidade material e rows órfãs.
+- Faça essa medição também no universo processual visível, não apenas nas rows do job corrente.
+  Execute `check_process_structure.py` e concilie suas contagens com a tela: a Validation pode
+  declarar zero overlaps dentro do `ctx` e, ainda assim, o oli-app exibir staging pendente de um
+  job anterior. Registre por `job_id` e `status_validacao` todas as owners encontradas.
 - Valide a tripla contra a taxonomia do perfil no commit auditado.
 - Não confunda envelope eletrônico com o ator/data material da peça.
 - Página com múltiplos atos exige conferir se todos sobreviveram ao Indexing e ao Refinement.
@@ -38,7 +42,26 @@ Em todas as indexações, confira identidade, intervalo, data, tripla taxonômic
   `$preaprovar-compactacoes-documentais`. Ausência intencional das folhas compactadas em
   `DATA.folhas` não é lacuna se o checkpoint e o PDF de origem preservarem o lastro previsto.
 
-### 3.1. Completude causal e transições externas
+### 3.1. Colisão entre jobs e staging órfão
+
+Rows `pendente` ou `aprovado` de outro job continuam materialmente visíveis mesmo quando o job
+proprietário é legado, terminal ou não aparece na fila do oli-app. Elas não podem ser ignoradas
+como histórico nem camufladas por filtro de UI. Trate como finding estrutural e confronte:
+
+- proprietário real, estado do job, aprovação, lease/heartbeat e data da execução;
+- CNJ, status, contagem, intervalos, IDs e hash canônico do conjunto;
+- versão/modelo e hashes de prompt efetivamente usados nos jobs concorrentes;
+- cobertura, gaps, overlaps e duplicidades exatas depois de selecionar a fonte que permanecerá.
+
+Se dois jobs concorrem pelas mesmas folhas e o job mais novo está elegível, prefira-o somente
+quando a trilha comprovar execução/configuração posterior ou correções materiais já verificadas.
+A limpeza do staging antigo é operação destrutiva separada: exige autorização explícita para o
+`job_id` exato, manifesto prévio, filtro `job_id + status_validacao`, ausência de worker vivo e
+readback com zero rows antigas. Nunca promova, apague ou recategorize rows para apenas fazer o
+detector passar. Depois da limpeza, repita a auditoria estrutural, causal e especializada e
+publique relatório sucessor; a limpeza não aprova o job.
+
+### 3.2. Completude causal e transições externas
 
 Cobertura estrutural responde se todas as folhas **recebidas** foram indexadas. Antes de `APTO`,
 responda separadamente se a sequência processual está materialmente completa. Monte um ledger

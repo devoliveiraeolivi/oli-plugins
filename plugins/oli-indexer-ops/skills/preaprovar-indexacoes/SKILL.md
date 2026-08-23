@@ -16,6 +16,18 @@ não é lacuna quando o corpus termina na remessa/distribuição e não há ato 
 seu encerramento. O bloqueio nasce de `gaps`, de consequência posterior sem causa material ou de
 estado/resultado afirmado sem fonte; o script não inventa qual foi o desfecho jurídico.
 
+Execute ainda `scripts/check_process_structure.py --repo <repo> --job-id <uuid>`. Esse detector
+é obrigatoriamente **process-wide**: lê todas as `DATA.indexacoes` do CNJ e compara o job atual
+com a união visível `pendente ∪ aprovado ∪ concluido`, em vez de confiar no recorte por `job_id`
+ou no relatório de Validation. Qualquer `blockers > 0` impede `APTO` até a origem ser explicada e
+o estado persistido ser corrigido e relido.
+
+Não esconda no relatório nem recomende que o oli-app esconda rows de outros jobs: a visão do
+processo inteiro é uma defesa contra staging órfão. Intervalos idênticos, overlaps parciais e gaps
+devem permanecer expostos. Não reclassifique duplicata técnica como `Documento (Duplicação)`;
+essa subclasse só caberia a um documento material que declare a duplicação, não a duas rows que
+competem pelas mesmas folhas.
+
 ## Composição obrigatória
 
 Resolva `area/perfil` pelo job e aplique exatamente uma especialização:
