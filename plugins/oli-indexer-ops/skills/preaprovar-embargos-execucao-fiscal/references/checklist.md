@@ -25,6 +25,10 @@
 - Separe extinção sem mérito, procedência total/parcial, improcedência e perda de objeto; vincule cada resultado à CDA ou tese alcançada.
 - Confira honorários, sucumbência e reflexo efetivo sobre exigibilidade, garantia e execução de origem.
 - Concilie dossiê, argumentos, insights e resumo com a última decisão eficaz, sem antecipar trânsito ou resultado recursal.
+- Se a 2ª instância anular/cassar a sentença e a cadeia recursal dessa anulação transitar ou
+  precluir com retorno definitivo à origem, aplique a regra comum de estado corrente: 1ª e 2ª
+  instâncias ficam `Não Julgado` até nova sentença de mérito. Preserve a anulação como resultado
+  histórico/procedimental; não a converta em julgamento favorável de mérito da 2ª instância.
 
 ## Atos críticos obrigatórios
 

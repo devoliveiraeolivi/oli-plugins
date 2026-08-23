@@ -27,6 +27,10 @@ Não presuma que o arquivo local foi o prompt usado. Compare `OPS.llm_runs.templ
 Em todas as indexações, confira identidade, intervalo, data, tripla taxonômica, título, resumo, função/nome responsável, referência processual, resultado, resultado do cliente e status de validação.
 
 - Meça páginas do escopo, lacunas, sobreposições incompatíveis, duplicidade material e rows órfãs.
+- Faça essa medição também no universo processual visível, não apenas nas rows do job corrente.
+  Execute `check_process_structure.py` e concilie suas contagens com a tela: a Validation pode
+  declarar zero overlaps dentro do `ctx` e, ainda assim, o oli-app exibir staging pendente de um
+  job anterior. Registre por `job_id` e `status_validacao` todas as owners encontradas.
 - Valide a tripla contra a taxonomia do perfil no commit auditado.
 - Não confunda envelope eletrônico com o ator/data material da peça.
 - Página com múltiplos atos exige conferir se todos sobreviveram ao Indexing e ao Refinement.
@@ -38,7 +42,26 @@ Em todas as indexações, confira identidade, intervalo, data, tripla taxonômic
   `$preaprovar-compactacoes-documentais`. Ausência intencional das folhas compactadas em
   `DATA.folhas` não é lacuna se o checkpoint e o PDF de origem preservarem o lastro previsto.
 
-### 3.1. Completude causal e transições externas
+### 3.1. Colisão entre jobs e staging órfão
+
+Rows `pendente` ou `aprovado` de outro job continuam materialmente visíveis mesmo quando o job
+proprietário é legado, terminal ou não aparece na fila do oli-app. Elas não podem ser ignoradas
+como histórico nem camufladas por filtro de UI. Trate como finding estrutural e confronte:
+
+- proprietário real, estado do job, aprovação, lease/heartbeat e data da execução;
+- CNJ, status, contagem, intervalos, IDs e hash canônico do conjunto;
+- versão/modelo e hashes de prompt efetivamente usados nos jobs concorrentes;
+- cobertura, gaps, overlaps e duplicidades exatas depois de selecionar a fonte que permanecerá.
+
+Se dois jobs concorrem pelas mesmas folhas e o job mais novo está elegível, prefira-o somente
+quando a trilha comprovar execução/configuração posterior ou correções materiais já verificadas.
+A limpeza do staging antigo é operação destrutiva separada: exige autorização explícita para o
+`job_id` exato, manifesto prévio, filtro `job_id + status_validacao`, ausência de worker vivo e
+readback com zero rows antigas. Nunca promova, apague ou recategorize rows para apenas fazer o
+detector passar. Depois da limpeza, repita a auditoria estrutural, causal e especializada e
+publique relatório sucessor; a limpeza não aprova o job.
+
+### 3.2. Completude causal e transições externas
 
 Cobertura estrutural responde se todas as folhas **recebidas** foram indexadas. Antes de `APTO`,
 responda separadamente se a sequência processual está materialmente completa. Monte um ledger
@@ -90,6 +113,29 @@ consegue nomear o ato externo ausente.
 - Confira `DATA.processos` e checkpoints apenas para detectar drift de persistência; eles não substituem o resultado do job em aprovação.
 - Mudança de topologia invalida toda análise horizontal das rows produzidas e toda vertical que as
   absorveu. Nunca copie envelope, resultado, evento, resumo ou cascata da topologia anterior.
+
+### 4.1. Anulação de sentença e estado corrente das instâncias judiciais
+
+Na vertical judicial `julgamentos`, os campos por instância representam o estado corrente do
+julgamento de mérito, não todo pronunciamento historicamente favorável ou desfavorável. Quando a
+2ª instância anular ou cassar a sentença e determinar o retorno à origem:
+
+- enquanto a anulação ainda estiver sujeita a Embargos de Declaração, Agravo Interno ou outro
+  recurso capaz de revertê-la, não antecipe a reabertura: preserve os resultados correntes que a
+  fonte ainda sustenta;
+- depois de encerrada essa cadeia recursal, com trânsito/preclusão do pronunciamento anulatório e
+  retorno ou determinação definitiva de retorno à 1ª instância, marque **tanto 1ª quanto 2ª
+  instância como `Não Julgado`**, salvo se já houver nova sentença de mérito posterior ao retorno;
+- não marque a 2ª instância como `Favorável` apenas porque a anulação beneficiou o autor: a decisão
+  anulou o julgamento anterior, mas não substituiu a sentença por um julgamento de mérito;
+- preserve no resumo, argumentos, julgadores e linha do tempo a sentença anulada, os recursos e o
+  acórdão anulatório. O reset alcança somente os indicadores correntes por instância;
+- trânsito do acórdão anulatório não é trânsito do processo: se a causa voltou para instrução ou
+  novo julgamento, `transito_julgado` continua `Sem Trânsito em Julgado`.
+
+Confirme a sequência material completa — sentença, anulação/cassação, recursos contra a anulação,
+trânsito/preclusão e retorno à origem — antes de aplicar o reset. Ausência dessa estabilização não
+autoriza usar `Não Julgado` para ocultar recurso ainda pendente ou lacuna de corpus.
 
 ## 5. Validation, reviewer e edições humanas
 
