@@ -91,6 +91,29 @@ consegue nomear o ato externo ausente.
 - Mudança de topologia invalida toda análise horizontal das rows produzidas e toda vertical que as
   absorveu. Nunca copie envelope, resultado, evento, resumo ou cascata da topologia anterior.
 
+### 4.1. Anulação de sentença e estado corrente das instâncias judiciais
+
+Na vertical judicial `julgamentos`, os campos por instância representam o estado corrente do
+julgamento de mérito, não todo pronunciamento historicamente favorável ou desfavorável. Quando a
+2ª instância anular ou cassar a sentença e determinar o retorno à origem:
+
+- enquanto a anulação ainda estiver sujeita a Embargos de Declaração, Agravo Interno ou outro
+  recurso capaz de revertê-la, não antecipe a reabertura: preserve os resultados correntes que a
+  fonte ainda sustenta;
+- depois de encerrada essa cadeia recursal, com trânsito/preclusão do pronunciamento anulatório e
+  retorno ou determinação definitiva de retorno à 1ª instância, marque **tanto 1ª quanto 2ª
+  instância como `Não Julgado`**, salvo se já houver nova sentença de mérito posterior ao retorno;
+- não marque a 2ª instância como `Favorável` apenas porque a anulação beneficiou o autor: a decisão
+  anulou o julgamento anterior, mas não substituiu a sentença por um julgamento de mérito;
+- preserve no resumo, argumentos, julgadores e linha do tempo a sentença anulada, os recursos e o
+  acórdão anulatório. O reset alcança somente os indicadores correntes por instância;
+- trânsito do acórdão anulatório não é trânsito do processo: se a causa voltou para instrução ou
+  novo julgamento, `transito_julgado` continua `Sem Trânsito em Julgado`.
+
+Confirme a sequência material completa — sentença, anulação/cassação, recursos contra a anulação,
+trânsito/preclusão e retorno à origem — antes de aplicar o reset. Ausência dessa estabilização não
+autoriza usar `Não Julgado` para ocultar recurso ainda pendente ou lacuna de corpus.
+
 ## 5. Validation, reviewer e edições humanas
 
 - Leia relatório, warnings, findings, divergências e instruções bloqueadas.
