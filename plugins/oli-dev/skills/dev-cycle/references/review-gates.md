@@ -13,16 +13,24 @@ revisado" que ninguém mais questiona.
 - **O conductor adjudica com evidência, não por deferência.** Claim load-bearing ou que
   contradiga o código é checada antes de virar ação.
 
-## Fase 2 — pré-código (sobre brainstorm + spec)
+## Fase 2 — pré-código (sobre brainstorm + spec) — SÓ NO TIER `full`
 
-**1 subagente `staff-reviewer`** (effort alto) em **Opus nos dois tiers** — julgamento sobre a
-spec inteira não é onde se economiza modelo. Mandato cético e amplo, sem lista fechada de
-categorias. Incorpore, atualize a spec, commit. Só avance quando a spec sobrevive ao review.
+**No default esta fase não roda.** Revisar spec é revisar um palpite sobre código que ainda não
+existe: é a camada de menor rendimento do ciclo, e erro de spec reaparece no diff, onde o
+`/code-review` da Fase 5 tem evidência para julgar. **Pule e anuncie que pulou** — pular em
+silêncio é o modo de falha. Mudança que toca contrato, enforcement ou superfície sensível cai no
+piso de segurança de `references/setup-gate.md`: recomende `full` e peça ack.
+
+**No `full`:** 1 subagente `staff-reviewer` (effort alto) em **Opus** — julgamento sobre a spec
+inteira não é onde se economiza modelo. Mandato cético e amplo, sem lista fechada de categorias.
+Incorpore e atualize a spec. Só avance quando a spec sobrevive ao review. O commit do artefato
+(spec + plano) é o da Fase 3.
 
 ## Fase 5 — pós-código (sobre o diff)
 
-Idêntica nos dois tiers. `/code-review` roda seu fleet próprio; o resto roda no contexto do
-conductor (**Opus 5**), que adjudica.
+Idêntica nos dois tiers, e **no default é o primeiro caça-bug do ciclo** — por isso nada aqui
+degrada por tier. `/code-review` roda seu fleet próprio; o resto roda no contexto do conductor
+(**Opus 5**), que adjudica.
 
 1. `/code-review` (effort alto) — bugs de correção; verifique os achados adversarialmente. É o
    **único caça-bug de contexto fresco sobre o diff inteiro**, e o que substitui o branch review.

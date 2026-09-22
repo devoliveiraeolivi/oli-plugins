@@ -6,7 +6,7 @@ encadeando skills do **superpowers** com gates opinativos.
 ## Requisitos
 - **superpowers** instalado (este plugin invoca suas skills). Sem ele, a skill avisa e para.
 - **Loop principal em Opus 5.** Uma skill é markdown e não troca o modelo da sessão; a Fase 0
-  verifica e bloqueia até você confirmar. Todo papel de **julgamento** roda em Opus em ambos
+  verifica e bloqueia até você confirmar. Todo papel de **julgamento** roda em Opus quando roda
   (conductor, staff-reviewer, adjudicação); o **tier** troca **camadas de review**, não modelo —
   os escritores TDD rodam em Sonnet nos dois.
 
@@ -18,25 +18,30 @@ encadeando skills do **superpowers** com gates opinativos.
 
 ## Uso
 - `/oli-dev <ideia da feature>` → ciclo completo (Fases 0–7), termina em PR aberta. Default
-  **enxuto**: sem task-reviewer por task, escritores TDD em **Sonnet 5**. Julgamento segue em
-  Opus; `/code-review`/`verify`/pre-push inalterados. `light` é aceito como alias do default
-  (compatibilidade). Ver `skills/dev-cycle/references/setup-gate.md`.
-- `/oli-dev full <ideia>` → readiciona **só** o task-reviewer por task (Fase 4), para
-  contrato/enforcement/superfície sensível.
+  **enxuto**: sem review de spec (F2) e sem task-reviewer por task (F4), escritores TDD em
+  **Sonnet 5**. Julgamento segue em Opus; `/code-review`/`verify`/pre-push inalterados. `light` é
+  aceito como alias do default (compatibilidade). Ver `skills/dev-cycle/references/setup-gate.md`.
+- `/oli-dev full <ideia>` → readiciona as **duas** camadas de review em Opus — staff-reviewer da
+  spec (Fase 2) e task-reviewer por task (Fase 4) — para contrato/enforcement/superfície sensível.
 - `/oli-dev finalize` → close-out + limpeza pós-merge (Fase 8), depois que a PR foi mergeada.
 
 ## O que ele faz
-worktree da main → brainstorm → review staff cético → plano → escrita TDD por subagente
+worktree da main → brainstorm + plano (um artefato) → escrita TDD por subagente
 → code-review/simplify/verify (+security-review condicional) → pre-push gate → PR → finalize.
 
-**Um caça-bug por artefato:** spec → staff-reviewer (F2), diff → `/code-review` (F5). Não há review
-final de branch na F4 (a F5 cobre o mesmo diff com fleet maior) e o `/simplify` só roda em diff
-> ~150 linhas.
+**Um caça-bug por artefato — e só sobre artefato que existe.** No default o caça-bug é
+diff → `/code-review` (F5). Revisar spec é revisar um palpite sobre código que ainda não existe:
+fica no `full` (F2). Não há review final de branch na F4 (a F5 cobre o mesmo diff com fleet maior)
+e o `/simplify` só roda em diff > ~150 linhas.
+
+**Um artefato por ciclo:** a spec em `docs/superpowers/specs/` carrega o plano na seção
+`## Plano`. Um commit fecha os dois.
 
 ## Gates duros (invioláveis)
 1. Uma branch por ciclo, da `main`, sem stacked. 2. Worktree sempre, da `main`.
 3. Nunca deletar branch sem `gh pr view --json state == MERGED`. 4. Conductor e todo papel de
-julgamento sempre Opus; o tier mexe em camada, não em modelo de review.
+julgamento sempre Opus; o tier mexe em camada, não em modelo de review. 5. Superfície sensível
+(auth, secrets, SQL/RPC, rede, cripto) exige ack explícito para seguir no default.
 
 ## Hook de pre-push
 `hooks/pre-push-gate.sh` é um backstop PreToolUse: em `git push`, detecta a stack

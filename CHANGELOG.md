@@ -27,6 +27,27 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 
 #### Changed
 
+- **MAJOR — o staff-reviewer de spec (Fase 2) sai do caminho padrão e passa a rodar só no
+  `full`.** Revisar spec é revisar um palpite sobre código que ainda não existe: é a camada de
+  menor rendimento do ciclo, e erro de spec reaparece no diff, onde o `/code-review` da Fase 5 tem
+  evidência para julgar. No default a Fase 2 é pulada **com anúncio** — pular em silêncio é o modo
+  de falha. `full` passa a significar duas camadas de julgamento sobre prosa e código:
+  staff-reviewer da spec (F2) + task-reviewer por task (F4). O piso de segurança fica mais
+  forte: superfície sensível (auth, secrets, SQL/RPC, rede, cripto) exige **ack explícito** para
+  seguir no default, já que agora são duas camadas que ficam de fora, não uma.
+  Classificado como **MAJOR** (`policies/SEMVER.md`: "remoção de fase/gate").
+  - Novos evals `sensitive_surface_needs_ack` e `single_cycle_artifact`;
+    `skip_precode_review` e `default_tier_scope` reescritos para o novo escopo do tier.
+
+- **Um artefato por ciclo: o plano da Fase 3 passa a ser a seção `## Plano` da spec da Fase 1.**
+  Antes o ciclo produzia dois arquivos (`docs/superpowers/specs/` e `docs/superpowers/plans/`) e
+  três commits antes da primeira linha de código. Agora a Fase 1 escreve a spec e grava o tier no
+  cabeçalho, a Fase 3 anexa o plano na mesma spec, e **um** commit fecha os dois. É **override
+  deliberado** de `superpowers:writing-plans`, que criaria arquivo próprio — a mesma classe de
+  override já documentada para o branch review do SDD. O resume da Fase 0 passa a detectar
+  `## Plano` dentro da spec, e ciclo antigo com arquivo separado em `plans/` continua sendo
+  reconhecido como spec+plano.
+
 - **MAJOR — o default deixa de rodar task-reviewer por task; `full` vira o opt-in que o
   readiciona.** Antes, `full` era o tier default (task-reviewer por task incluído) e `light` era
   o opt-in enxuto. Agora o default é o enxuto: sem task-reviewer por task (Fase 4) e escritores

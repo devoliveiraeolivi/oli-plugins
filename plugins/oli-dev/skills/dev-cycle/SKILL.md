@@ -1,6 +1,6 @@
 ---
 name: dev-cycle
-description: Use ao construir uma feature/mudança nova no ecossistema OLI — conduz o ciclo completo (worktree da main, brainstorm, review staff cético, plano, escrita TDD por subagente, review code/simplify/verify, pre-push gate, PR, finalize pós-merge), com um caça-bug por artefato. Invocada por `/oli-dev <ideia>` (default enxuto), `/oli-dev full <ideia>` (soma o task-reviewer por task) e `/oli-dev finalize`.
+description: Use ao construir uma feature/mudança nova no ecossistema OLI — conduz o ciclo completo (worktree da main, brainstorm, plano, escrita TDD por subagente, review code/simplify/verify, pre-push gate, PR, finalize pós-merge), com um caça-bug por artefato. Invocada por `/oli-dev <ideia>` (default enxuto), `/oli-dev full <ideia>` (soma staff-reviewer de spec e task-reviewer por task) e `/oli-dev finalize`.
 ---
 
 # dev-cycle — maestro do ciclo de desenvolvimento OLI
@@ -8,7 +8,8 @@ description: Use ao construir uma feature/mudança nova no ecossistema OLI — c
 ## When to Use
 
 - `/oli-dev <ideia>` → ciclo completo (Fases 0–7), termina em PR aberta. Default enxuto.
-- `/oli-dev full <ideia>` → soma o task-reviewer por task (`references/setup-gate.md`).
+- `/oli-dev full <ideia>` → soma o staff-reviewer de spec (F2) e o task-reviewer por task (F4)
+  (`references/setup-gate.md`).
 - `/oli-dev finalize` → só a Fase 8 (close-out + limpeza), depois da PR mergeada.
 - Ative também quando o usuário descreve uma feature nova e pede para construir/implementar.
 
@@ -26,11 +27,14 @@ NÃO use para: hotfix trivial de 1 linha já aprovado, perguntas, ou tarefas sem
 3. **Nunca deletar branch** — nem seguir empurrando nela — sem `gh pr view <n> --json state`.
    PR `MERGED` → commits ali viram órfãos. O hook `branch-state-guard.sh` bloqueia; a Fase 0
    recusa retomar numa branch mergeada.
-4. **Um caça-bug por artefato.** Passe de LLM sobre o mesmo código é o custo real do ciclo, e
-   review do review rende concordância e churn. Spec → staff-reviewer (F2); diff →
-   `/code-review` (F5). **Sem review final de branch na Fase 4** — a F5 cobre o mesmo diff
-   (**override deliberado** do SDD; não re-adicione por deferência à skill invocada). Papel de
-   julgamento roda em **Opus**: conductor, staff-reviewer, adjudicação. Escritores TDD em Sonnet.
+4. **Um caça-bug por artefato — e só sobre artefato que já existe.** Passe de LLM sobre o mesmo
+   código é o custo real do ciclo, e review do review rende concordância e churn. O caça-bug do
+   caminho padrão é **diff → `/code-review` (F5)**. Spec → staff-reviewer (F2) roda **só no
+   `full`**: revisar spec é revisar um palpite sobre código que ainda não existe — é a camada de
+   menor rendimento do ciclo, e erro de spec reaparece no diff, onde há evidência para julgar.
+   **Sem review final de branch na Fase 4** — a F5 cobre o mesmo diff (**override deliberado** do
+   SDD; não re-adicione por deferência à skill invocada). Papel de julgamento roda em **Opus**:
+   conductor, staff-reviewer, adjudicação. Escritores TDD em Sonnet.
 5. **Não presuma o que não dá pra verificar — pergunte, se for material.** Fato que carrega o
    design e vem de memória ou inferência: pare e confirme. Fonte verificada = arquivo:linha,
    output de comando, doc do `oli-platform`, ou o usuário. Premissa barata de reverter: assuma,
@@ -47,10 +51,13 @@ Um todo por fase. Modo `<ideia>` = Fases 0–7; modo `finalize` = Fase 8. Carreg
 
 - **Fase 0 — SETUP** → `references/setup-gate.md`. Opus, deps, tier, worktree da `main`, resume.
 - **Fase 1 — BRAINSTORM** → `superpowers:brainstorming`. Spec em `docs/superpowers/specs/`, com
-  o Princípio 5 valendo em cada premissa material. Commit.
-- **Fase 2 — REVIEW pré-código** → `references/review-gates.md`. Commit.
-- **Fase 3 — PLANO** → `superpowers:writing-plans`. **Grave o tier no cabeçalho do plano** — o
-  resume da Fase 0 depende disso. Commit.
+  o Princípio 5 valendo em cada premissa material. **Grave o tier no cabeçalho da spec** — o
+  resume da Fase 0 depende disso. Sem commit ainda: a Fase 3 fecha o artefato.
+- **Fase 2 — REVIEW pré-código** — **só no tier `full`** → `references/review-gates.md`. No
+  default não roda: pule e **anuncie que pulou**, nunca em silêncio.
+- **Fase 3 — PLANO** → `superpowers:writing-plans`, escrito na seção `## Plano` **da própria
+  spec** — um artefato por ciclo, não dois (**override deliberado**: a skill invocada criaria
+  arquivo separado em `docs/superpowers/plans/`). Um commit fecha spec + plano.
 - **Fase 4 — ESCRITA** → `superpowers:subagent-driven-development`; cada task em TDD, escritores
   com `model: "sonnet"`. Task-reviewer por task só no `full`. Checkpoint commit por task.
 - **Fase 5 — REVIEW pós-código** → `references/review-gates.md`.
