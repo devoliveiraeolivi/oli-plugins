@@ -6,7 +6,7 @@ Marketplace de plugins do ecossistema OLI para Claude Code e Codex.
 
 | Plugin | Produto | Descrição |
 |---|---|---|
-| [oli-dev](plugins/oli-dev/) | Claude Code | Maestro do ciclo de desenvolvimento OLI (worktree → brainstorm → review → plano → TDD → review → pre-push → PR → finalize). |
+| [oli-dev](plugins/oli-dev/) | Claude Code | Maestro do ciclo de desenvolvimento OLI (worktree → brainstorm + plano → TDD → review → pre-push → PR → finalize). |
 | [oli-indexer-ops](plugins/oli-indexer-ops/) | Codex | Consulta, rastreia, executa e pré-aprova jobs do oli-indexer com relatórios e patches versionados, sem substituir a aprovação humana. |
 
 ## Instalação no Claude Code

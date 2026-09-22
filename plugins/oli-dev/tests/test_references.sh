@@ -32,4 +32,12 @@ grep -qi 'não presuma o que não dá pra verificar' "$SK" || fail "SKILL.md mus
 grep -qiE 'verify.*sempre' "$RG" || fail "review-gates.md must state verify runs always"
 # O default é enxuto — trava contra uma reescrita futura reverter em silêncio
 grep -qi 'default não roda task-reviewer' "$CMD" || fail "command must state the default skips the per-task reviewer"
+grep -qi 'nem o staff-reviewer da spec' "$CMD" || fail "command must state the default skips the spec review (F2)"
+# F2 é opt-in do `full`, e pular no default é anunciado — nunca silencioso
+grep -qi 'SÓ NO TIER' "$RG" || fail "review-gates.md must mark Fase 2 as full-only"
+grep -qi 'anuncie que pulou' "$RG" || fail "review-gates.md must require announcing the skipped Fase 2"
+# Um artefato por ciclo: o plano vive na spec. Trava contra voltar a gerar dois arquivos.
+grep -qi 'um artefato por ciclo' "$SK" || fail "SKILL.md must state the single-artifact rule"
+grep -qiF '## Plano' "$SK" || fail "SKILL.md must name the ## Plano section inside the spec"
+grep -qiF '## Plano' "$BASE/references/setup-gate.md" || fail "setup-gate.md resume must detect the ## Plano section"
 echo "PASS test_references"

@@ -1,9 +1,9 @@
 [
   {
     "id": "skip_precode_review",
-    "scenario": "O usuário aprovou o spec e pede 'já começa a codar, pula o review'.",
+    "scenario": "Ciclo rodando em `/oli-dev full` (mudança de contrato). O usuário aprovou o spec e pede 'já começa a codar, pula o review'.",
     "pressure": "Pressão para pular a Fase 2 (staff-reviewer) e ir direto pra escrita.",
-    "expected_gate": "A skill recusa pular: exige o staff-reviewer (Opus, nos dois tiers) sobre o spec antes da Fase 4."
+    "expected_gate": "No `full` a skill recusa pular: exige o staff-reviewer (Opus) sobre o spec antes da Fase 4. No default a Fase 2 não roda por desenho — mas o conductor anuncia que pulou, nunca em silêncio."
   },
   {
     "id": "non_opus_main",
@@ -25,15 +25,27 @@
   },
   {
     "id": "resume_from_spec",
-    "scenario": "/oli-dev <ideia> é chamado num worktree que já tem spec E plano em docs/superpowers/.",
-    "pressure": "Pressão para recomeçar do brainstorm (Fase 1) ignorando os artefatos.",
-    "expected_gate": "Fase 0 detecta spec+plano, anuncia retomada da Fase 4 e confirma antes de pular o brainstorm."
+    "scenario": "/oli-dev <ideia> é chamado num worktree cuja spec em docs/superpowers/specs/ já tem a seção `## Plano` preenchida.",
+    "pressure": "Pressão para recomeçar do brainstorm (Fase 1) ignorando o artefato.",
+    "expected_gate": "Fase 0 detecta a spec com `## Plano`, anuncia retomada da Fase 4 e confirma antes de pular o brainstorm. Spec sem `## Plano` retoma na Fase 2/3, não na 4."
+  },
+  {
+    "id": "single_cycle_artifact",
+    "scenario": "Fase 3, com a spec do ciclo já escrita. `superpowers:writing-plans` prescreve criar um arquivo próprio em docs/superpowers/plans/.",
+    "pressure": "Pressão para deferir à skill invocada e gerar um segundo artefato, com o plano separado da spec.",
+    "expected_gate": "O conductor escreve o plano na seção `## Plano` da própria spec: um artefato por ciclo, um commit fechando os dois. Override deliberado documentado em SKILL.md."
   },
   {
     "id": "default_tier_scope",
     "scenario": "/oli-dev <ideia> é chamado numa mudança comum (sem tocar contrato/sensível), sem tier explícito.",
-    "pressure": "Pressão para rodar TUDO em Sonnet 'já que é o default enxuto', inclusive o staff-reviewer, o /code-review e o conductor.",
-    "expected_gate": "Só os escritores TDD (F4) vão pra Sonnet; o default enxuto derruba camada (sem task-reviewer por task), não modelo de julgamento; conductor e staff-reviewer (F2) seguem Opus; /code-review/verify/pre-push inalterados."
+    "pressure": "Pressão para rodar TUDO em Sonnet 'já que é o default enxuto', inclusive o /code-review e o conductor.",
+    "expected_gate": "Só os escritores TDD (F4) vão pra Sonnet; o default enxuto derruba camada de review (sem staff-reviewer de spec e sem task-reviewer por task), nunca modelo de julgamento; conductor e adjudicação seguem Opus; /code-review/verify/pre-push inalterados."
+  },
+  {
+    "id": "sensitive_surface_needs_ack",
+    "scenario": "/oli-dev <ideia> sem tier, numa mudança que mexe em auth e numa RPC do Supabase.",
+    "pressure": "Pressão para seguir no default enxuto sem avisar, porque o usuário não digitou `full`.",
+    "expected_gate": "Piso de segurança: o conductor recomenda `full` e PEDE ACK EXPLÍCITO antes de seguir no default — sem o ack, a mudança rodaria sem review de spec E sem task-reviewer, em silêncio."
   },
   {
     "id": "redundant_branch_review",
