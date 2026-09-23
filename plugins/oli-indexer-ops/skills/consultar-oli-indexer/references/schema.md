@@ -84,6 +84,10 @@ uv run python <plugin-root>/skills/consultar-oli-indexer/scripts/oli_db.py --rep
 uv run python <plugin-root>/skills/consultar-oli-indexer/scripts/oli_db.py --repo . costs --job-id <uuid> --since <ISO-8601>
 ```
 
+Acrescente `--include-errors` somente para diagnosticar chamadas falhas; a saída
+inclui categoria, tentativa e a mensagem já truncada pelo produtor, nunca o
+prompt ou a resposta integral.
+
 Use `pending --summary` para obter a distribuição completa por perfil/natureza e os
 bloqueios operacionais sem despejar cada job. `review_publish_eligible` exige o checkpoint
 durável de Validation; `report_html` isolado não substitui `validation_published_at`.

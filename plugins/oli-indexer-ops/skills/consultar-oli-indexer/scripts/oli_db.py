@@ -48,7 +48,7 @@ class _ReportTextParser(HTMLParser):
 def _repo_root(value: str) -> Path:
     root = Path(value).expanduser().resolve()
     if not (root / "src" / "oli_indexer").is_dir():
-        raise argparse.ArgumentTypeError(f"não é um checkout do oli-indexer: {root}")
+        raise argparse.ArgumentTypeError(f"não é um checkout do oli-indexador: {root}")
     return root
 
 
@@ -86,6 +86,11 @@ def _parser() -> argparse.ArgumentParser:
     costs = sub.add_parser("costs", help="Agrega llm_runs do job")
     costs.add_argument("--job-id", required=True)
     costs.add_argument("--since", help="ISO-8601; sem valor lê todo o histórico do job")
+    costs.add_argument(
+        "--include-errors",
+        action="store_true",
+        help="Inclui categoria, tentativa e mensagem truncada das chamadas com erro",
+    )
 
     processo = sub.add_parser("processo", help="Lê metadados seguros de DATA.processos")
     processo.add_argument("--cnj", required=True)
@@ -301,7 +306,8 @@ def _pending_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def _cost_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     grouped: dict[str, dict[str, Any]] = defaultdict(
         lambda: {"calls": 0, "ok": 0, "errors": 0, "input_tokens": 0,
-                 "output_tokens": 0, "cached_tokens": 0, "cost_usd": 0.0, "models": set()}
+                 "output_tokens": 0, "cached_tokens": 0, "cost_usd": 0.0,
+                 "models": set(), "error_categories": Counter()}
     )
     for row in rows:
         item = grouped[str(row.get("operacao") or "<none>")]
@@ -314,10 +320,13 @@ def _cost_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         item["cost_usd"] += float(row.get("cost_usd") or 0)
         if row.get("model"):
             item["models"].add(row["model"])
+        if row.get("status") != "ok":
+            item["error_categories"][str(row.get("erro_categoria") or "unknown")] += 1
     by_operation = []
     for operation, item in grouped.items():
         item["cost_usd"] = round(item["cost_usd"], 8)
         item["models"] = sorted(item["models"])
+        item["error_categories"] = dict(sorted(item["error_categories"].items()))
         by_operation.append({"operation": operation, **item})
     by_operation.sort(key=lambda item: item["cost_usd"], reverse=True)
     return {
@@ -333,7 +342,10 @@ def _cost_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
 async def _llm_rows(client: Any, job_id: str, since: str | None) -> list[dict[str, Any]]:
     params = {
         "contexto->>job_id": f"eq.{job_id}",
-        "select": "created_at,operacao,model,status,input_tokens,output_tokens,cached_tokens,cost_usd",
+        "select": (
+            "created_at,operacao,model,status,input_tokens,output_tokens,"
+            "cached_tokens,cost_usd,erro_categoria,erro_msg,retry_count"
+        ),
         "order": "created_at.asc",
     }
     if since:
@@ -381,7 +393,25 @@ async def _run(args: argparse.Namespace) -> None:
     if args.command == "costs":
         async with client_cls(config.supabase_jobs) as ops:
             rows = await _llm_rows(ops, args.job_id, args.since)
-        _json({"observed_at": observed_at, "job_id": args.job_id, "since": args.since, **_cost_summary(rows)})
+        result = {
+            "observed_at": observed_at,
+            "job_id": args.job_id,
+            "since": args.since,
+            **_cost_summary(rows),
+        }
+        if args.include_errors:
+            result["errors"] = [
+                {
+                    "created_at": row.get("created_at"),
+                    "operation": row.get("operacao"),
+                    "category": row.get("erro_categoria"),
+                    "retry_count": row.get("retry_count"),
+                    "message": row.get("erro_msg"),
+                }
+                for row in rows
+                if row.get("status") != "ok"
+            ]
+        _json(result)
         return
 
     if args.command == "validation":
