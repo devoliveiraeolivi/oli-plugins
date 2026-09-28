@@ -102,16 +102,18 @@ Essas camadas acrescentam gates; não substituem a referência principal.
 - A pré-aprovação técnica e jurídica é executada localmente por esta skill e suas referências;
   reviewer externo é uma camada opcional de evidência, nunca pré-requisito para `APTO`.
 - O pedido de pré-aprovação autoriza, para os jobs do snapshot inicial, salvar os artefatos de
-  controle e fechar patches determinísticos elegíveis pelo runner oficial com CAS, estado
-  terminal, readback, reauditoria e relatório sucessor.
+  controle e publicar um único patch determinístico exaustivo. O clique **Aplicar patch** continua
+  humano; depois dele, CAS, estado terminal, readback e ativação do parecer antecipado não exigem
+  novo turno de análise.
 - Não autoriza correção ad hoc, alvo novo, LLM/reviewer, recall/delete, reprocessamento, backfill,
   mudança de código/prompt, Conclusion ou aprovação humana.
 - Nunca altere `approved_at`, `approved_by`, `status` para conclusão nem o gate/timestamp de revisão
   secundária. Esses campos pertencem ao fluxo humano ou ao produtor autorizado.
-- Aplique um patch corrente por vez. Pare em ambiguidade, escopo novo, conflito CAS recorrente,
-  `failed` ou `failed_partial`; preserve a evidência e reporte o ponto exato.
-- Patch verificado corrige o dado, mas não aprova o job. Merge/split invalida dependências e exige
-  nova pré-aprovação antes de qualquer recomposição horizontal ou vertical.
+- Não pare no primeiro defeito: execute a auditoria inteira e reconcilie todos os findings antes
+  de publicar. Use report-only blocked apenas para ambiguidade jurídica real ou bloqueio técnico.
+- Patch verificado corrige o dado e pode ativar o parecer favorável antecipado, mas nunca aprova o
+  job. Merge/split final só leva `completion.report` quando as horizontais e verticais afetadas já
+  estiverem materializadas no mesmo plano; resultados pagos não afetados são preservados.
 
 Use `review-report/v1`, `review-patch/v1` para correções esparsas e `review-patch/v2` para
 merge/split. Valide e publique com `reviewctl`; nunca escreva diretamente nas tabelas nem use SQL
@@ -120,7 +122,8 @@ livre. O ciclo completo, contratos e readbacks obrigatórios estão no protocolo
 ## Entrega
 
 Separe fatos, inferências e lacunas. Informe identidade, fontes, cobertura, findings, perfil e
-camadas lidas, custo novo, patches/runs/readbacks, parecer corrente e gates ainda pendentes. Use
-somente `APTO`, `APTO COM RESSALVAS`, `REVISÃO NECESSÁRIA` ou `BLOQUEADO` conforme o protocolo.
+camadas lidas, custo novo, patches/runs/readbacks, parecer corrente e gates ainda pendentes. A
+comunicação termina em **Aplicar patch**, **Aprovar**, **Aguardando processamento** ou **Decisão
+jurídica necessária**; estado técnico interno aparece somente em erro.
 Antes de publicar, aplique também o gate editorial da seção 8.1 do protocolo a todos os campos
 humanos exibidos na UI.

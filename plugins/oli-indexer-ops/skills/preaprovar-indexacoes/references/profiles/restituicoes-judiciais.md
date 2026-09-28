@@ -2,6 +2,14 @@
 
 Execute depois do protocolo comum. Valores taxonômicos e analyzers válidos vêm da configuração atual do perfil `tributario/conhecimento`.
 
+Use `$inspecionar-configuracao-indexacao` em toda auditoria desta referência para confirmar
+taxonomia, prompts, grafo, dispatch, analyzers e schemas efetivamente usados; não confie apenas no
+checkout.
+
+Exija `area=tributario`, perfil `conhecimento` e natureza `Ação Restituição` ou `MS - Restituição`;
+confirme também a classe cadastral `Restituição` quando disponível. Não use esta referência para
+outras ações de conhecimento nem para `administrativo_creditorio`.
+
 ## 1. Identidade do rito
 
 - Separe `Ação Restituição` de `MS - Restituição`. Ambas discutem indébito, mas a sequência processual e os efeitos do provimento não são intercambiáveis.
@@ -89,5 +97,9 @@ Por processo, escreva:
 2. veredito;
 3. tabela `fls. | está | deve ficar | por quê`;
 4. divergências das verticais;
-5. patch proposto, sem aplicá-lo;
+5. ciclo do patch: ausente ou `publicado → aplicado/verificado → parecer sucessor`;
 6. custo histórico e, quando identificável, delta da execução.
+
+Reporte separadamente objeto tributário, modalidade de recuperação, período e valores, cadeia de
+julgamentos, eficácia de atos de outros autos e verticais. Não esconda processo bloqueado em total
+consolidado.

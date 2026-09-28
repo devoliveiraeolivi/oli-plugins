@@ -208,34 +208,39 @@ Registre separadamente:
 
 - A leitura de resultados existentes não autoriza nova chamada.
 - Meça `OPS.llm_runs` pela janela da execução; total histórico deve ser rotulado como histórico.
-- O pedido de pré-aprovação autoriza os patches determinísticos elegíveis gerados nesta mesma
-  auditoria para os jobs do snapshot inicial, incluindo publicação, aplicação oficial, CAS,
-  readback, reauditoria e relatório sucessor. Não peça confirmação intermediária para esse ciclo.
+- O pedido de pré-aprovação autoriza autoria e publicação dos patches determinísticos elegíveis
+  gerados nesta auditoria para os jobs do snapshot inicial. A aplicação oficial continua sendo o
+  clique humano **Aplicar patch**; depois dele, CAS, readback e ativação do parecer não exigem
+  confirmação intermediária.
 - Antes de qualquer LLM, reviewer, recall/delete, reprocessamento, backfill legado, mudança de
   código/prompt ou correção fora de `review-patch`, apresente escopo, chamadas/modelos, estimativa,
   teto prudencial e alternativa determinística e aguarde autorização própria.
 
 ## 8. Parecer
 
-Use exatamente um estado:
+Classifique internamente o parecer, mas entregue um dos quatro resultados operacionais:
 
 - `APTO`: cobertura integral comum e especializada, sem dúvida material.
 - `APTO COM RESSALVAS`: somente limitação opcional sem impacto em classificação, conteúdo, rastreabilidade ou decisão.
 - `REVISÃO NECESSÁRIA`: dúvida semântica localizada para usuário/reviewer ou outro achado material
   que exija decisão humana e não admita correção determinística unívoca.
 - `BLOQUEADO`: erro material sem patch determinístico seguro, fonte ou alvo elegível ausente,
-  ambiguidade, cobertura incompleta, ou aplicação sem verificação terminal.
+  cobertura incompleta, ou aplicação sem verificação terminal. Ambiguidade jurídica real é
+  `REVISÃO NECESSÁRIA`, não bloqueio técnico.
 
-Não emita `BLOQUEADO` como desfecho final por um achado que já foi corrigido por patch autorizado
-e verificado. Refaça os gates sobre o estado persistido e emita um relatório sucessor. Se restar
+Não emita `BLOQUEADO` como desfecho final por um achado determinístico corrigível. Termine o plano,
+inclua o parecer favorável antecipado e entregue **Aplicar patch**. Se um patch legado sem
+`completion.report` já tiver sido verificado, refaça os gates e emita relatório sucessor. Se restar
 somente `revisao_secundaria_at < human_edited_at`, use `APTO` ou `APTO COM RESSALVAS` conforme a
 auditoria material e exponha o timestamp apenas como gate operacional pendente. No contrato,
 isso corresponde a `fit`/`fit_with_notes`, sem finding sintético de revisão secundária. O RPC de
 aprovação aceita somente esses vereditos positivos quando há relatório corrente; usar
 `review_required` para o próprio gate impede circularmente `Confirmar e aprovar`.
 
-Após merge/split aplicado, o parecer continua `BLOQUEADO` até a nova topologia passar pelos gates
-e as análises horizontais/verticais aplicáveis serem recompostas e revisadas.
+Não publique `BLOQUEADO` como entrega para erro determinístico corrigível. Faça a auditoria
+exaustiva, materialize as correções e dependências e entregue **Aplicar patch**. Sem patch, ou após
+ativação exata do parecer antecipado, entregue **Aprovar**. Durante o run use **Aguardando
+processamento**; ambiguidade jurídica real usa **Decisão jurídica necessária**.
 
 Saída mínima:
 
@@ -294,11 +299,11 @@ operações:
 - `job.vertical.replace`: substituição CAS do vertical permitido.
 
 Adote repair-first: se um erro puder ser corrigido por uma dessas operações, o resultado esperado
-é o estado corrigido e reavaliado, não uma lista de blockers acompanhada de patches não executados.
-Após fechar a passada inicial somente leitura, publique o patch; o próprio pedido de pré-aprovação
-autoriza aplicá-lo em seguida pelos caminhos oficiais, com CAS, estado terminal, readback e
-relatório sucessor. Não aguarde nova mensagem nem clique intermediário para o patch determinístico
-elegível.
+é o estado corrigido e reavaliado, não uma lista de blockers acompanhada de patches incompletos.
+Após fechar a passada inicial somente leitura, publique um patch exaustivo com o estado final e o
+parecer favorável antecipado quando representável. Entregue **Aplicar patch** e aguarde o clique;
+não enfileire por iniciativa própria. O runner executa CAS, readback e ativação do parecer sem nova
+análise.
 
 Para toda operação `indexacao.*`, copie do banco a identidade completa da row:
 `target.job_id = DATA.indexacoes.job_id` e `target.id_externo = DATA.indexacoes.id_externo`.
@@ -320,15 +325,19 @@ Quando a fonte demonstrar erro de unidade documental, gere `review-patch/v2` com
   `content_mode` e `integra_sha256` esperado;
 - `content_mode=rebuild_from_folhas` para conteúdo material local ou `pointer` para maço externo
   cujo conteúdo vive no processo referido;
-- análises, escalares, confiança, evidência, julgador e metadados de revisão das saídas limpos;
-  `status_validacao=pendente`;
+- análises, escalares, confiança, evidência, julgador e metadados de revisão das saídas inicialmente
+  limpos; `status_validacao=pendente`;
 - `impact.horizontal=invalidate` e todas as `vertical_keys` dependentes;
-- exatamente um `job.vertical.replace` que grave `null` nas chaves declaradas.
+- exatamente um `job.vertical.replace`. Sem conclusão antecipada ele grava `null`; com
+  `completion.report`, grava todas as verticais declaradas já recalculadas e inclui exatamente as
+  `indexacao.analysis.replace` exigidas pelos analyzers dos outputs.
 
 A união das folhas de saída deve ser idêntica à união das origens, contínua e sem sobreposição.
-Cada saída deve apontar somente para suas origens. Não misture merge/split com operações DATA v1
-no mesmo patch. Não use v2 para inserir ou retirar conteúdo sem reaproveitamento integral das
-folhas; nesse caso registre finding bloqueante.
+Cada saída deve apontar somente para suas origens. Nesta fundação não misture merge/split com
+`indexacao.update`; reflita a correção nos outputs ou resolva-a antes da proposta estrutural.
+`indexacao.analysis.replace` só entra como materialização pós-estrutural de um output. Não use v2
+para inserir ou retirar conteúdo sem reaproveitamento integral das folhas; se o contrato não
+representar a correção, registre `BLOQUEIO_TECNICO`.
 
 Para montar `expect.rows` sem despejar OCR ou recalcular hashes manualmente, gere antes uma
 fotografia local restrita:
@@ -365,26 +374,24 @@ O `save` grava apenas o control plane. Nunca grave as tabelas diretamente e nunc
 executável no JSON. Após a publicação, faça readback pelo gateway e reporte:
 `report_id`, `content_hash`, `patch_key`, `patch_revision_id`, `version` e `computed_risk`.
 
-### 9.1. Aplicação automática e fechamento do ciclo
+### 9.1. Aplicação humana e fechamento automático do ciclo
 
 Depois de publicar um patch determinístico elegível durante a pré-aprovação:
 
 1. releia job, cabeça corrente do relatório/patch, `content_hash`, elegibilidade e ausência de run
    ativo;
-2. aplique pelo oli-app/gateway com `expected_content_hash`, `request_id` idempotente e nota de
-   autorização que registre o pedido de pré-aprovação e delimite os jobs/operações; nunca escreva
-   diretamente nas tabelas;
+2. entregue **Aplicar patch** e aguarde o clique humano; não chame `approve_and_queue_*` por conta
+   própria. O gateway envia `expected_content_hash` e `request_id` idempotente;
 3. acompanhe o run até `verified`, `stale`, `failed` ou `failed_partial`; não trate `queued` ou
    `running` como sucesso e não repita cegamente uma tentativa terminal;
 4. em `verified`, compare cada alvo persistido com o `set`, confira efeitos estruturais,
    análises/verticais dependentes e `human_edited_at`; o readback interno do runner não substitui
    essa conferência independente;
-5. repita a régua comum e a especialização sobre o estado atual, recompute o `source_digest` sem
-   reutilizar a fotografia anterior e publique relatório sucessor com CAS das cabeças esperadas;
-6. se não restar dúvida material, retire o blocker antigo e publique `APTO`/`fit` (ou a ressalva
-   material cabível), ainda que `revisao_secundaria_at < human_edited_at`. Não crie finding para
-   esse timestamp: registre-o somente na recomendação/estado operacional, pois o oli-app confirma
-   o gate imediatamente antes da aprovação final;
+5. quando houver `completion.report`, o runner recomputa a fonte e ativa o parecer favorável na
+   mesma transação terminal somente se os digests esperado e real coincidirem. Não faça nova LLM,
+   revisão ou relatório sucessor;
+6. entregue **Aprovar** na mesma tela. Não crie finding para
+   `revisao_secundaria_at`: o oli-app confirma o gate na aprovação final;
 7. reporte separadamente correção verificada, parecer atual, gate secundário e aprovação do job.
    Nunca infira nem execute aprovação do job a partir do sucesso do patch.
 
@@ -403,11 +410,12 @@ surgir escopo novo ou o conflito CAS recorrer. Em `failed` ou `failed_partial`,
 preserve tentativa, erro e snapshots como evidência; proponha reparo específico
 em vez de criar nova execução indistinguível.
 
-Para v2, confira antes da publicação que `reviewctl schema --contract patch` e o gateway em uso
-aceitam `review-patch/v2`; não publique um contrato que o ambiente ainda não executa. Após a
-aplicação no app/gateway, faça readback de: topologia exata, hashes das íntegras, rows de
-linhagem, verticais nulas e `human_edited_at`. Em seguida produza novo relatório sobre o estado
-atual. A recomposição de análises é uma etapa separada, com custo e autorização próprios.
+Para v2, confira antes da publicação que contrato, gateway e runner aceitam conclusão estrutural;
+não publique um contrato que o ambiente ainda não executa. Antes de anunciar **Aplicar patch**,
+as recomposições horizontal/vertical necessárias já devem ter ocorrido e seus resultados devem
+constar do plano. Após o clique, faça readback de topologia, hashes, linhagem, análises, verticais,
+estado esperado e `human_edited_at`. Resultado pago fora das chaves afetadas deve permanecer
+idêntico.
 
 ## 10. Revisão solicitada pelo usuário
 

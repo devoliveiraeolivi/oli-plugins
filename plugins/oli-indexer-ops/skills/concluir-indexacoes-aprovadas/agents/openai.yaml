@@ -1,0 +1,6 @@
+interface:
+  display_name: "Concluir Indexações Aprovadas"
+  short_description: "Execute Conclusion após aprovação humana comprovada"
+  default_prompt: "Use $concluir-indexacoes-aprovadas para concluir somente os jobs humanamente aprovados deste escopo."
+policy:
+  allow_implicit_invocation: false

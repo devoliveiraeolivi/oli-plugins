@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Extrações"
+  short_description: "Audite a extração antes da Indexing"
+  default_prompt: "Use $preaprovar-extracoes para auditar integralmente este job em awaiting_extraction_review; só escreva se o runtime 0141/0142 estiver comprovado e, então, aplique apenas o reparo PyMuPDF allowlisted com CAS/readback e aceite um parecer sucessor positivo e fresco, sem aprovar o job."

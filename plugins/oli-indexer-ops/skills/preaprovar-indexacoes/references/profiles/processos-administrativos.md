@@ -2,6 +2,13 @@
 
 Execute depois do protocolo comum. Valores válidos vêm da configuração atual do perfil.
 
+Use `$inspecionar-configuracao-indexacao` em toda auditoria destes perfis para confirmar taxonomia,
+prompt, grafo, dispatch, analyzer e schema efetivamente usados; não confie apenas no checkout.
+
+Use somente para `tributario/administrativo_fiscal`, `administrativo_creditorio` ou
+`administrativo_regulatorio`. Não decida pelo formato do número do processo e não transporte rito,
+órgão, ator ou efeito entre os três perfis.
+
 ## 1. Rito, ator e taxonomia
 
 - Categoria identifica o ator; classe identifica o efeito/tipo do ato.
@@ -61,3 +68,13 @@ Regras:
 Revise integralmente todas as rows de julgamento, decisão de admissibilidade, defesa, recurso, pedido, lavratura, manifestação/parecer fiscal e trânsito administrativo; todas as rows com analyzer; e toda anomalia ou resumo genérico.
 
 No parecer, discrimine os três perfis administrativos e qualquer regra exclusiva identificada na taxonomia/grafo. Não esconda um processo bloqueado em totais consolidados.
+
+## Diagnóstico opcional de análises
+
+`scripts/backfill/corrigir_analises_faltantes.py` pode ser executado sem `--execute`, limitado aos
+CNJs/jobs auditados, para enumerar análises ausentes ou divergentes. O dry-run informa chamadas
+planejadas; não autoriza executá-las nem representa custo já incorrido.
+
+Em qualquer patch, preserve campos e escolhas já editados por humano fora do alvo determinístico
+fechado. Mudança de código ou prompt fica em worktree própria, recebe testes e só alcança runtime
+pelo fluxo `git → merge → apply`; a pré-aprovação não autoriza essas etapas.

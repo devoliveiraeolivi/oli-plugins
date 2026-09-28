@@ -1,6 +1,6 @@
 ---
 name: inspecionar-configuracao-indexacao
-description: Rastrear a configuração efetivamente usada por um job do oli-indexer, conciliando prompts publicados e históricos, hashes de chamadas, grafos, nós, perfil, taxonomia, contratos, schemas, dispatch e análises persistidas. Use para explicar por que uma classificação ou análise saiu assim, verificar drift entre git e Supabase ou preparar correção; leitura não autoriza publicação nem reprocessamento.
+description: Rastrear a configuração efetivamente usada por um job do oli-indexer, incluindo prompts, hashes, grafo, perfil, taxonomia, schemas e dispatch. Use para explicar resultados ou drift; a inspeção não autoriza publicação nem reprocessamento.
 ---
 
 # Inspecionar configuração da indexação

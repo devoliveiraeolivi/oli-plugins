@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pré-aprovar Prescrição Intercorrente"
+  short_description: "Revise a tese de prescrição nos autos"
+  default_prompt: "Use $preaprovar-prescricao-intercorrente para revisar esta análise pelo protocolo canônico."
+policy:
+  allow_implicit_invocation: false

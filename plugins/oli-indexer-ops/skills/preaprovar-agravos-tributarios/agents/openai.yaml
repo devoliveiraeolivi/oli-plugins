@@ -1,4 +1,6 @@
 interface:
   display_name: "Pré-aprovar agravos tributários"
   short_description: "Audita agravos de instrumento tributários"
-  default_prompt: "Use $preaprovar-agravos-tributarios para auditar em modo somente leitura os agravos tributários aguardando aprovação."
+  default_prompt: "Use $preaprovar-agravos-tributarios para auditar os agravos pendentes pelo protocolo canônico."
+policy:
+  allow_implicit_invocation: false

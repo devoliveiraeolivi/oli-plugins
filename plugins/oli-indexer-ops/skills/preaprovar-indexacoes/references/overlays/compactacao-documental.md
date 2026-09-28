@@ -1,5 +1,21 @@
 # Checklist de compactação documental
 
+## Limites e escalonamento
+
+- A primeira passada é somente leitura e não chama LLM, reviewer, OCR ou Vision.
+- Não baixe nem materialize todas as folhas fiscais. O PDF de origem e o checkpoint são o lastro;
+  abra somente as amostras e exceções exigidas abaixo.
+- Não trate a ausência intencional de folhas compactadas em `DATA.folhas` como falha de extração.
+  Bloqueie se também faltar checkpoint, fingerprint ou PDF recuperável.
+- Agrupamento de apresentação nunca pode apagar blocos técnicos nem atravessar uma página normal.
+- Conflito de autoria ou data não se resolve por herança; encaminhe ao reviewer ou à decisão
+  humana.
+
+Falha sistêmica de agrupamento ou herança exige correção de código e nova indexação controlada;
+não gere dezenas de merges estruturais para mascará-la. Patch versionado serve apenas para exceção
+localizada com fonte, impacto e digest fechados. Recall, materialização integral, OCR/Vision ou
+reprocessamento exigem autorização separada com custo e escopo.
+
 ## 1. Ativação e checkpoint
 
 - Registre `job_id`, CNJ, status, commit, gap e horário do snapshot.

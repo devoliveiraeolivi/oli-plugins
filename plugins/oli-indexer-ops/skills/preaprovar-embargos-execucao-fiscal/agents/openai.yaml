@@ -1,4 +1,6 @@
 interface:
   display_name: "Pré-aprovar Embargos à Execução Fiscal"
-  short_description: "Audite embargos fiscais e seu vínculo com a execução"
-  default_prompt: "Use $preaprovar-embargos-execucao-fiscal para auditar os embargos fiscais aguardando aprovação."
+  short_description: "Audite embargos fiscais e o vínculo com a execução"
+  default_prompt: "Use $preaprovar-embargos-execucao-fiscal para auditar estes embargos pelo protocolo canônico."
+policy:
+  allow_implicit_invocation: false

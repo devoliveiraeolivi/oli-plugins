@@ -1,6 +1,6 @@
 {
   "name": "oli-indexer-ops",
-  "version": "0.1.0+codex.20260902142521",
+  "version": "0.1.0",
   "description": "Orchestrate, trace, review, and safely conclude approved OLI Indexer jobs through explicit technical and human gates.",
   "author": {
     "name": "Cesar Batista"

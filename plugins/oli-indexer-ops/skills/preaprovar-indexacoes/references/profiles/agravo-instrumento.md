@@ -2,6 +2,14 @@
 
 Execute depois do protocolo comum. Valores taxonômicos e analyzers válidos vêm da configuração atual do perfil `tributario/agravo_instrumento`.
 
+Use `$inspecionar-configuracao-indexacao` em toda auditoria deste perfil para confirmar taxonomia,
+prompts, grafo, dispatch, analyzers e schemas efetivamente usados; não confie apenas no checkout.
+
+Use somente quando o próprio job tiver perfil `tributario/agravo_instrumento` e natureza `Agravo
+de Instrumento`; assunto, título ou menção a agravo não bastam. Bloco de AI juntado numa ação de
+conhecimento ou execução fiscal permanece sob a especialização do processo principal e segue as
+regras de cópia e eficácia, não esta checklist standalone.
+
 ## 1. Identidade recursal
 
 - Confirme o CNJ do próprio AI, o processo de origem, a decisão interlocutória recorrida, agravante, agravado e polo do cliente.
@@ -12,7 +20,14 @@ Execute depois do protocolo comum. Valores taxonômicos e analyzers válidos vê
 ## 2. Formação e granularidade
 
 - Delimite petição do agravo, comprovante de preparo e documentos obrigatórios/facultativos sem transformar a cópia integral da origem em timeline nativa.
-- Reconstrua os frames e slots do evento que juntou as peças da origem. Se as páginas formam um único pacote de cópia integral, a fragmentação folha a folha ou evento a evento é anomalia; anexos materialmente distintos permanecem separados. O mesmo CNJ, sozinho, não autoriza fundir documentos diferentes.
+- Reconstrua os frames, slots, `carimbo_subato`, cabeçalhos e nomes dos arquivos do evento que
+  juntou as peças da origem. Uma única petição ou um único `carimbo_ato` pode carregar vários
+  anexos: cada subato/arquivo `parte_N` permanece um documento, na ordem física das folhas, ainda
+  que todas as partes tenham o mesmo CNJ e componham juridicamente a mesma cópia integral.
+- Só trate como fragmentação artificial as divisões dentro do mesmo subato/arquivo. O mesmo CNJ
+  não autoriza merge de anexos distintos, e referências internas a pareceres, processos
+  administrativos ou ao TCU descrevem o conteúdo da parte; não viram processos juntados
+  autônomos sem invólucro próprio.
 - Ementa, relatório, voto, extrato/ata e acórdão do mesmo julgamento devem obedecer às regras de fusão ou de `Ato de Julgamento` do prompt atual.
 - Evento “recurso conhecido/não provido” seguido da juntada do inteiro teor do mesmo acórdão não pode produzir dois julgamentos materiais.
 - Inclusão em pauta e relatório anexado podem exigir dois andamentos: ato cartorário de pauta e `Julgador / Ato de Julgamento / Relatório de Julgamento`. Não fundir ambos como despacho apenas por compartilharem o evento.
@@ -66,6 +81,9 @@ Confirme dispositivo, objeto, recorrente, colegialidade, resultado e favorabilid
 - Uma decisão cumulativa pode alimentar liminar e segunda instância, conforme o dispositivo, sem criar dois andamentos falsos.
 - `transito_julgado` exige fonte explícita; vertical que infere trânsito de mero decurso é bloqueante.
 - Resumo, argumentos e dossiê devem distinguir tutela, mérito do AI e incidentes, e nunca chamar decisão terminativa de simples indeferimento de efeito suspensivo.
+- Para cada decisão crítica, confronte a vertical com `titulo`, `resumo` e o dispositivo/análise persistidos. Se o mesmo ato encerra o AI e também decide tutela, a vertical deve registrar primeiro o resultado terminal e depois a consequência sobre a tutela; a presença de um fato não compensa a omissão do outro.
+- Confirme que Embargos de Declaração e Agravo Interno apontam para a decisão efetivamente impugnada. Uma cadeia que chama a monocrática terminativa de simples liminar, mas depois registra recurso interno contra ela, é incoerente e bloqueante.
+- Texto anterior preservado não flexibiliza essa conferência. Após reanálise incremental ou do zero, audite o resumo corrente completo; omissão do dispositivo controlador continua sendo erro factual.
 
 ## 8. Casos de regressão obrigatórios
 
@@ -74,10 +92,13 @@ Trate como gates explícitos em toda auditoria:
 - o mesmo acórdão aparece duas vezes: evento de julgamento/juntada e inteiro teor em rows separados;
 - `Agravo Prejudicado` foi aplicado a embargos de declaração prejudicados;
 - inclusão em pauta com relatório foi comprimida em um despacho e o relatório desapareceu;
-- um único pacote de cópia integral da origem foi fragmentado em dezenas de andamentos sem apoio nos frames/slots; não acione este gate apenas porque anexos distintos referem o mesmo CNJ;
+- um mesmo subato/arquivo da cópia integral foi fragmentado em dezenas de andamentos sem apoio nos
+  frames/slots; não acione este gate contra anexos distintos nem os funda apenas porque referem o
+  mesmo CNJ ou foram juntados no mesmo ato;
 - dossiê marcou trânsito apenas porque houve decurso de prazo;
 - decisão recorrida da origem foi classificada como Julgador do AI;
 - subclasses `(Agravo) ...` aparecem nos autos nativos do AI.
+- decisão monocrática menciona tutela, mas o dispositivo dá/nega provimento ou não conhece do AI: andamento e vertical devem usar o resultado terminal como núcleo, preservar eventual efeito secundário e manter coerentes ED/Agravo Interno posteriores.
 
 ## 9. Cobertura e saída
 
@@ -89,5 +110,9 @@ Por processo, escreva:
 2. veredito;
 3. tabela `fls. | está | deve ficar | por quê`;
 4. divergências das verticais;
-5. patch proposto, sem aplicá-lo;
+5. ciclo do patch: ausente ou `publicado → aplicado/verificado → parecer sucessor`;
 6. custo histórico e, quando identificável, delta da execução.
+
+Reporte separadamente origem e decisão recorrida, tutela recursal, julgamento final do AI,
+incidentes posteriores, trânsito/baixa e verticais. Não esconda processo bloqueado em total
+consolidado.

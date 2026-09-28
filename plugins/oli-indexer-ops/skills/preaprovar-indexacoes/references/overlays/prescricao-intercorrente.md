@@ -180,9 +180,10 @@ Antes de propor `job.vertical.replace`:
    aos valores cobertos pelo parecer; resumo, julgamentos e outras verticais permanecem byte a byte
    equivalentes no envelope;
 6. valide e calcule o digest patch-aware;
-7. publique e, se a saída completa for determinística e unívoca, aplique pelo ciclo automático da
-   pré-aprovação com CAS; não aplique quando a alternativa jurídica ainda depender do usuário;
-8. depois de `verified`, faça readback, reexecute esta checklist e publique relatório sucessor.
+7. publique a saída determinística e unívoca no plano final e entregue **Aplicar patch**; decisão
+   jurídica ainda ambígua permanece **Decisão jurídica necessária**;
+8. depois de `verified`, confira o readback. Com `completion.report`, não repita a checklist nem
+   publique sucessor: o parecer favorável já foi ativado para o estado exato.
 
 O patch desta camada contém exatamente uma operação `job.vertical.replace`; não combine mudança
 colateral em resumo, julgamentos ou outra vertical. Se a chave estiver ausente, nula, vazia ou

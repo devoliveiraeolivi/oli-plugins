@@ -1,0 +1,6 @@
+interface:
+  display_name: "Reconciliar Orquestração Pós-Reaper"
+  short_description: "Feche ledgers órfãos sem repetir efeitos pagos"
+  default_prompt: "Use $reconciliar-orquestracao-pos-reaper para reconciliar somente o target exato já encerrado pelo reaper."
+policy:
+  allow_implicit_invocation: false

@@ -33,6 +33,8 @@ def _contains_any(text: str, needles: tuple[str, ...]) -> bool:
 def _kind(row: dict[str, Any]) -> set[str]:
     text = _haystack(row)
     kinds: set[str] = set()
+    if _norm(row.get("subclasse")) == "peticao inicial":
+        kinds.add("opening")
     if _contains_any(
         text,
         (
@@ -86,6 +88,7 @@ def _event(row: dict[str, Any], kinds: set[str]) -> dict[str, Any]:
         "class": row.get("classe"),
         "subclass": row.get("subclasse"),
         "title": row.get("titulo"),
+        "process_reference": row.get("numero_processo_ref"),
         "kinds": sorted(kinds),
     }
 
@@ -102,6 +105,31 @@ def analyze(rows: list[dict[str, Any]]) -> dict[str, Any]:
     tagged = [(row, _kind(row)) for row in ordered]
     branches: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
+
+    initial_petitions = [
+        _event(row, kinds)
+        for row, kinds in tagged
+        if "opening" in kinds
+    ]
+    if len(initial_petitions) > 1:
+        gaps.append(
+            {
+                "code": "PETICAO_INICIAL_DUPLICADA",
+                "severity": "blocker",
+                "candidates": initial_petitions,
+                "reason": (
+                    "Há mais de uma row classificada como Petição Inicial no universo "
+                    "processual visível; isso quebra a unicidade da âncora inaugural."
+                ),
+                "required": (
+                    "Abrir todas as candidatas e reconciliar o processo de origem, "
+                    "numero_processo_ref, mapeamento_origem, mapeamento_ref, "
+                    "mapeamento_relacao e o invólucro da juntada. Material trasladado ou "
+                    "copiado de outro processo não pode permanecer como Petição Inicial "
+                    "nativa deste processo."
+                ),
+            }
+        )
 
     for index, (row, kinds) in enumerate(tagged):
         if "remittance" not in kinds:

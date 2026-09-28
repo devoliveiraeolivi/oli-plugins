@@ -1,9 +1,13 @@
 # Checklist — Medida Cautelar Fiscal
 
+A Medida Cautelar Fiscal é preventiva, regida pela Lei 8.397/1992, e não se confunde com a
+execução fiscal relacionada. Preserve o alcance subjetivo e patrimonial próprio de cada decisão.
+
 ## Objeto e pressupostos
 
 - Identifique requerente, requeridos, crédito tributário, procedimento administrativo e eventual execução fiscal relacionada.
-- Abra inicial e documentos que sustentam constituição do crédito e hipótese legal de indisponibilidade.
+- Abra inicial e documentos que sustentam constituição do crédito e cada requisito invocado da
+  Lei 8.397/1992 para a indisponibilidade.
 - Diferencie alegação fazendária, indício, prova e requisito efetivamente reconhecido pelo julgador.
 
 ## Alcance patrimonial e subjetivo
