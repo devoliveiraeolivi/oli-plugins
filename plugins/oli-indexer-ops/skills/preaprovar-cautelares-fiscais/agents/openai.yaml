@@ -1,4 +1,6 @@
 interface:
   display_name: "Pré-aprovar Cautelares Fiscais"
   short_description: "Audite cautelares fiscais e ordens patrimoniais"
-  default_prompt: "Use $preaprovar-cautelares-fiscais para auditar as medidas cautelares fiscais aguardando aprovação."
+  default_prompt: "Use $preaprovar-cautelares-fiscais para auditar esta cautelar pelo protocolo canônico."
+policy:
+  allow_implicit_invocation: false

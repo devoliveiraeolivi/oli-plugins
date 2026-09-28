@@ -1,4 +1,6 @@
 interface:
   display_name: "Pré-aprovar Execuções Fiscais"
   short_description: "Audite execuções fiscais antes da aprovação humana"
-  default_prompt: "Use $preaprovar-execucoes-fiscais para auditar os jobs de execução fiscal aguardando aprovação."
+  default_prompt: "Use $preaprovar-execucoes-fiscais para auditar esta execução pelo protocolo canônico."
+policy:
+  allow_implicit_invocation: false

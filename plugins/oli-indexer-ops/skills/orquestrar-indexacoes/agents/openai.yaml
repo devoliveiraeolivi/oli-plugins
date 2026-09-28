@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orquestrar Indexações"
+  short_description: "Coordene o ciclo técnico dos jobs de indexação"
+  default_prompt: "Use $orquestrar-indexacoes para conduzir este conjunto de jobs até o próximo gate autorizado."

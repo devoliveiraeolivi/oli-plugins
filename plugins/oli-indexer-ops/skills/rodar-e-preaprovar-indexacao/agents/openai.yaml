@@ -2,3 +2,5 @@ interface:
   display_name: "Rodar e Pré-aprovar Indexação"
   short_description: "Execute jobs com custo controlado e audite o resultado"
   default_prompt: "Use $rodar-e-preaprovar-indexacao para criar ou selecionar jobs, executar e pré-aprovar a indexação."
+policy:
+  allow_implicit_invocation: false

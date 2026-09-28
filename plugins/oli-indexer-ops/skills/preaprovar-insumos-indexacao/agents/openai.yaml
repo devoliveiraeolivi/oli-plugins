@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pré-aprovar Insumos"
+  short_description: "Prepare o plano exaustivo antes das análises"
+  default_prompt: "Use $preaprovar-insumos-indexacao para auditar todo o corpus deste job e preparar um único patch exaustivo para aplicação humana, sem executar o clique nem chamar LLM."

@@ -1,142 +1,129 @@
 ---
 name: preaprovar-indexacoes
-description: Aplicar o protocolo comum de pré-aprovação do oli-indexer, compô-lo com a régua especializada, publicar relatório/patch versionados e, sob autorização explícita, resolver correções determinísticas com CAS e readback antes do novo parecer. Use para auditar jobs antes da aprovação humana, inclusive quando o tipo ainda precisa ser resolvido; não aprova job, chama LLM, reprocessa nem aplica patch sem autorização separada.
+description: Auditar jobs do oli-indexer após as análises e antes da aprovação humana, aplicando o protocolo comum e a régua jurídica do perfil. A primeira passada é somente leitura; patches determinísticos elegíveis podem ser fechados, mas a skill nunca aprova o job nem chama LLM ou reprocessa sem autorização separada.
 ---
 
 # Pré-aprovar indexações
 
-Esta é a régua comum. Ela garante que todos os perfis especializados tenham o mesmo padrão de identidade, cobertura, rastreabilidade, custo e parecer, sem apagar suas diferenças jurídicas.
+Produza o parecer técnico final sem substituir a aprovação humana. A régua comum controla
+identidade, cobertura, rastreabilidade, custo e reparos; a referência do perfil acrescenta os
+gates jurídicos aplicáveis.
 
-Antes da auditoria, leia [references/protocolo.md](references/protocolo.md), use `$consultar-oli-indexer` para as fontes e `$inspecionar-configuracao-indexacao` quando a conclusão depender de prompt, grafo, taxonomia, contrato ou analyzer.
+Antes da auditoria, leia [references/protocolo.md](references/protocolo.md). Use
+`$consultar-oli-indexer` para OPS/DATA e `$inspecionar-configuracao-indexacao` apenas quando a
+conclusão depender de prompt, grafo, taxonomia, contrato, schema, dispatch ou analyzer.
 
-Para todo job, execute também `scripts/check_logical_chain.py --repo <repo> --job-id <uuid>`.
-Saída com `blockers > 0` impede `APTO` e deve ser conciliada com a íntegra e a régua
-especializada. `branches[].status=open`, isoladamente, descreve uma etapa terminal ainda pendente:
-não é lacuna quando o corpus termina na remessa/distribuição e não há ato posterior que pressuponha
-seu encerramento. O bloqueio nasce de `gaps`, de consequência posterior sem causa material ou de
-estado/resultado afirmado sem fonte; o script não inventa qual foi o desfecho jurídico.
+## Diagnóstico obrigatório
 
-Execute ainda `scripts/check_process_structure.py --repo <repo> --job-id <uuid>`. Esse detector
-é obrigatoriamente **process-wide**: lê todas as `DATA.indexacoes` do CNJ e compara o job atual
-com a união visível `pendente ∪ aprovado ∪ concluido`, em vez de confiar no recorte por `job_id`
-ou no relatório de Validation. Qualquer `blockers > 0` impede `APTO` até a origem ser explicada e
-o estado persistido ser corrigido e relido.
+Antes de abrir o primeiro snapshot, resolva o alvo:
 
-Não esconda no relatório nem recomende que o oli-app esconda rows de outros jobs: a visão do
-processo inteiro é uma defesa contra staging órfão. Intervalos idênticos, overlaps parciais e gaps
-devem permanecer expostos. Não reclassifique duplicata técnica como `Documento (Duplicação)`;
-essa subclasse só caberia a um documento material que declare a duplicação, não a duas rows que
-competem pelas mesmas folhas.
+- Com `job_id` ou CNJ explícito, confirme que o job pertence ao perfil e à natureza pedidos.
+- Sem `job_id` ou CNJ, use `$consultar-oli-indexer` para listar deterministicamente jobs
+  `queue=indexing`, `status=awaiting_approval` e `approved_at` vazio, filtrados pelo
+  `area/perfil/natureza` solicitado; informe a quantidade antes de auditar um por vez.
+- Para restituições, separe `Ação Restituição` de `MS - Restituição`. Para administrativos,
+  discrimine os três perfis exatos. Mais de um job aberto para o mesmo processo impede escolher o
+  vigente por conveniência.
+- Resolva identidade pela row do job e pela configuração do indexador, nunca apenas por assunto,
+  título, menção textual, formato do número ou aparência do CNJ.
 
-## Composição obrigatória
+Para todo job:
 
-Resolva `area/perfil` pelo job e aplique exatamente uma especialização:
+1. congele job, processo, checkpoint e cabeças correntes conforme o protocolo;
+2. leia `DATA.indexacoes` do processo inteiro, preservando o `job_id` proprietário de cada row;
+3. execute os três detectores em `scripts/`:
+   - `check_logical_chain.py`;
+   - `check_process_structure.py`;
+   - `list_deterministic_findings.py`;
+4. concilie cada finding com a fonte material e a régua do perfil;
+5. classifique cada achado como `patchavel` ou `nao_patchavel` antes do parecer.
 
-- `tributario/execucao_fiscal`: `$preaprovar-execucoes-fiscais`.
-- `tributario/conhecimento` com natureza `Ação Restituição` ou `MS - Restituição`: `$preaprovar-restituicoes-tributarias`.
-- `tributario/conhecimento` com natureza `Embargos à Execução Fiscal`: `$preaprovar-embargos-execucao-fiscal`.
-- `tributario/conhecimento` nas demais naturezas: `$preaprovar-conhecimento-tributario`.
-- `tributario/agravo_instrumento`: `$preaprovar-agravos-tributarios`.
-- `tributario/cautelar_fiscal`: `$preaprovar-cautelares-fiscais`.
-- `tributario/administrativo_fiscal`, `administrativo_creditorio` ou `administrativo_regulatorio`: `$preaprovar-processos-administrativos`.
-- Perfil sem especialização: use a régua comum, mas o parecer não pode ser `APTO`; reporte `REVISÃO NECESSÁRIA` ou `BLOQUEADO` e diga qual conhecimento de domínio falta.
+`blockers > 0` impede `APTO`, mas o detector não substitui interpretação jurídica. Branch
+terminal ainda aberta não é lacuna por si só quando o corpus termina na remessa/distribuição e
+nenhum ato posterior pressupõe desfecho. `snapshot.complete=false` exige detectores legados
+aplicáveis ou Validation completa; nunca significa ausência de warnings.
 
-Job legado sem `output.perfil` não é roteado por palpite. Resolva o perfil esperado com a
-mesma configuração do indexador, usando área, classe, natureza e tribunal, registre a
-divergência cadastral e aplique a checklist correspondente apenas como diagnóstico. O parecer
-fica `BLOQUEADO` até a identidade do perfil do job ser confirmada ou saneada.
+Não esconda rows de outros jobs nem transforme duplicata técnica em `Documento (Duplicação)`.
+Gaps, overlaps, staging órfão e owners anteriores continuam visíveis no processo inteiro.
 
-A especialização acrescenta gates; não substitui nem relaxa o protocolo comum. Não aplique regras de um perfil por analogia a outro.
+Execute todos os scripts Python desta skill pelo ambiente do repositório:
+`uv run python <caminho-do-script>`. Não use o `python3` do sistema, porque ele
+não carrega as dependências e o `.env` do `oli-indexador`.
 
-## Camada documental adicional
+## Roteamento jurídico
 
-Se `OPS.jobs.output.compactacao_documental` existir ou alguma row tiver evidência iniciada por
-`compactacao_documental:`, aplique também `$preaprovar-compactacoes-documentais`. Essa régua é
-ortogonal ao perfil: ela confere checkpoint, grupos de apresentação, herança de metadados e
-exceções sem substituir a especialização jurídica escolhida acima.
+Resolva `area/perfil/natureza` pelo job e leia exatamente uma referência principal:
 
-## Limites
+- `tributario/execucao_fiscal`:
+  [execução fiscal](references/profiles/execucao-fiscal.md);
+- `tributario/conhecimento` + `Ação Restituição` ou `MS - Restituição`:
+  [restituições judiciais](references/profiles/restituicoes-judiciais.md);
+- `tributario/conhecimento` + `Embargos à Execução Fiscal`:
+  [embargos à execução fiscal](references/profiles/embargos-execucao-fiscal.md);
+- demais naturezas de `tributario/conhecimento`: leia
+  [conhecimento tributário](references/profiles/conhecimento-tributario.md), mas só admita `APTO`
+  quando houver seção material explícita para a natureza; não transporte gates por analogia;
+- `tributario/agravo_instrumento` + natureza `Agravo de Instrumento`:
+  [agravo de instrumento](references/profiles/agravo-instrumento.md);
+- `tributario/cautelar_fiscal`:
+  [cautelar fiscal](references/profiles/cautelar-fiscal.md);
+- `tributario/administrativo_fiscal`, `administrativo_creditorio` ou
+  `administrativo_regulatorio`:
+  [processos administrativos](references/profiles/processos-administrativos.md).
 
-- A primeira passada é somente leitura e sem novas chamadas ao LLM do indexador.
-- A pré-aprovação pode gravar somente artefatos de controle imutáveis
-  (`indexing_review_reports` e `indexing_review_patches`) pelo `reviewctl save`, depois de
-  anunciar essa etapa. Ela não altera `indexacoes`, análises, `jobs.llm_results`, prompts,
-  status, aprovação ou gate secundário.
-- Qualquer correção, reviewer, recall ou reprocessamento é uma operação posterior, com escopo, custo e autorização próprios.
-- Autorizada a aplicação de um patch determinístico, não encerre o trabalho no parecer antigo:
-  aplique-o com CAS, acompanhe o run até estado terminal, faça readback material, repita a
-  pré-aprovação e publique o relatório sucessor. Patch verificado não aprova o job.
-- O gate `revisao_secundaria_at >= human_edited_at` é independente do parecer material. Se a
-  reauditoria pós-patch não encontrar dúvida material, publique `fit`/`fit_with_notes` e relate o
-  gate pendente apenas como próxima ação humana; nunca crie finding `F-SECONDARY-REVIEW` nem use
-  `review_required` só por esse timestamp. O oli-app confirma o gate antes da aprovação final, e
-  um parecer não positivo tornaria `Confirmar e aprovar` circular.
-- `APTO` exige cobertura integral prevista no protocolo comum, completude causal da linha do
-  tempo e todos os gates da especialização. Cobertura de 100% das folhas disponíveis não prova
-  que o corpus esteja completo quando os próprios atos apontam para outro processo, instância ou
-  incidente. Amostragem nunca autoriza esse parecer.
+Perfil sem referência explícita recebe apenas a régua comum, deve indicar qual conhecimento de
+domínio falta e termina somente `REVISÃO NECESSÁRIA` ou `BLOQUEADO`, nunca `APTO` ou `APTO COM
+RESSALVAS`. Job legado sem `output.perfil` não é roteado por palpite: derive o perfil esperado pela
+configuração do indexador usando área, classe, natureza e tribunal, registre a divergência e use a
+referência correspondente somente como diagnóstico. Mantenha `BLOQUEADO` até confirmar ou sanear
+a identidade.
 
-## Regra repair-first
+## Camadas condicionais
 
-Antes do parecer, classifique cada achado como `patchavel` ou `nao_patchavel`. É `patchavel`
-somente quando a fonte auditada determina sem ambiguidade o valor correto, o contrato de patch
-aceita o alvo, a identidade e o estado corrente foram lidos, e a correção não depende de LLM,
-reviewer, nova fonte, recall ou reprocessamento.
+Além da referência principal, leia somente quando o gatilho existir:
 
-- Para todo achado `patchavel`, gere e publique o patch no mesmo fluxo. Não entregue apenas a
-  descrição do erro nem recomende uma correção manual já representável por `review-patch`.
-- Se o pedido corrente já contém autorização explícita para corrigir/aplicar aquele escopo,
-  aplique o patch imediatamente após preflight e prossiga até readback e parecer sucessor. Não
-  mantenha `BLOQUEADO` por um erro que o patch autorizado acabou de resolver.
-- Sem autorização de aplicação, preserve a separação de autoridade: publique o patch e use
-  `REVISÃO NECESSÁRIA`, indicando que a única ação pendente é autorizar/revisar sua aplicação.
-  O dado ainda incorreto impede `APTO`, mas não deve ser apresentado como impasse material.
-- Use `BLOQUEADO` quando não houver correção determinística segura, faltar fonte ou alvo elegível,
-  houver ambiguidade, o contrato não representar a mudança, ou a aplicação terminar
-  `stale`, `failed` ou `failed_partial` sem reparo verificado. Nunca force um patch para evitar o
-  bloqueio.
+- [compactação documental](references/overlays/compactacao-documental.md), quando houver
+  `output.compactacao_documental` ou evidência `compactacao_documental:`;
+- [prescrição intercorrente](references/overlays/prescricao-intercorrente.md), em execução fiscal
+  quando o grafo publicado declarar a vertical legada ou
+  `jobs.llm_results.prescricao_intercorrente` existir como objeto não vazio. Só
+  nesse caso execute `uv run python scripts/check_prescricao_intercorrente.py
+  --input <snapshot.json>`. Menção ao art. 40, frustração, parcelamento ou
+  decisão continua exigindo revisão material dentro do ledger EF v5, mas não
+  autoriza fabricar nem cobrar a vertical legada. Idade do processo, feed
+  vazio, ausência de notícia, citação, penhora ou garantia isoladas não bastam.
 
-Leia em [references/protocolo.md](references/protocolo.md) o ciclo de aplicação, readback e
-publicação sucessora.
+Essas camadas acrescentam gates; não substituem a referência principal.
 
-## Artefatos e publicação
+## Autoridade e fechamento
 
-Para cada job, produza em diretório local de artefatos um `report.json` conforme
-`review-report/v1` e, somente quando toda correção for determinística e suportada, um
-`patch.json`. Use `review-patch/v1` para correções esparsas e `review-patch/v2` somente
-para `merge`/`split` estruturais. Use UUIDs reais e um `patch_key` curto e estável. O patch
-contém operações tipadas, valores `expect`/`set`, impacto e linhagem quando aplicáveis;
-nunca contém SQL livre.
+- A primeira passada, até fechar e classificar o snapshot, é somente leitura e sem nova chamada
+  ao LLM do indexador.
+- A pré-aprovação técnica e jurídica é executada localmente por esta skill e suas referências;
+  reviewer externo é uma camada opcional de evidência, nunca pré-requisito para `APTO`.
+- O pedido de pré-aprovação autoriza, para os jobs do snapshot inicial, salvar os artefatos de
+  controle e publicar um único patch determinístico exaustivo. O clique **Aplicar patch** continua
+  humano; depois dele, CAS, estado terminal, readback e ativação do parecer antecipado não exigem
+  novo turno de análise.
+- Não autoriza correção ad hoc, alvo novo, LLM/reviewer, recall/delete, reprocessamento, backfill,
+  mudança de código/prompt, Conclusion ou aprovação humana.
+- Nunca altere `approved_at`, `approved_by`, `status` para conclusão nem o gate/timestamp de revisão
+  secundária. Esses campos pertencem ao fluxo humano ou ao produtor autorizado.
+- Não pare no primeiro defeito: execute a auditoria inteira e reconcilie todos os findings antes
+  de publicar. Use report-only blocked apenas para ambiguidade jurídica real ou bloqueio técnico.
+- Patch verificado corrige o dado e pode ativar o parecer favorável antecipado, mas nunca aprova o
+  job. Merge/split final só leva `completion.report` quando as horizontais e verticais afetadas já
+  estiverem materializadas no mesmo plano; resultados pagos não afetados são preservados.
 
-Valide com `reviewctl validate`, recompute o `source_digest` e publique pelo gateway com
-`reviewctl save`, enviando as cabeças esperadas lidas do OPS. Sempre que houver patch, v1 ou
-v2, calcule com `reviewctl digest --patch <patch.json>`; sem essa associação, alvos explícitos
-fora do staging atual não entram na fotografia e o snapshot é inválido. Para patch estrutural,
-o digest usa `review-source/v2`. Conflito `STALE_*` exige nova leitura; nunca sobrescreva por
-último. Se não houver correção segura, publique o relatório sem patch. Informe IDs, hash,
-chave e versão persistidos.
+Use `review-report/v1`, `review-patch/v1` para correções esparsas e `review-patch/v2` para
+merge/split. Valide e publique com `reviewctl`; nunca escreva diretamente nas tabelas nem use SQL
+livre. O ciclo completo, contratos e readbacks obrigatórios estão no protocolo.
 
-Ao auditar o processo completo, um erro pode estar numa `DATA.indexacoes` de incremento
-anterior. Nesse caso, `target.job_id` deve ser o proprietário real lido naquela row, nunca o
-`job_id` do relatório por conveniência. Em v1, só proponha esse alvo se ele tiver o mesmo CNJ,
-estiver `concluido` e existir um job atual elegível em pré-aprovação; não use essa exceção para
-corrigir processo fechado, `DATA.processos` ou projeções derivadas.
+## Entrega
 
-Merge/split é a primeira de duas revisões. A aplicação estrutural deixa as saídas pendentes,
-invalida horizontais e remove verticais dependentes; não herda conclusões nem chama LLM. Após o
-readback da topologia e da linhagem, execute nova pré-aprovação sobre o estado atual e proponha a
-recomposição horizontal/vertical separadamente. Patch estrutural verificado não torna o job
-`APTO` por si só.
-
-Antes do `save`, exija `jobs.validation_published_at` preenchido. Em jobs anteriores ao
-checkpoint, não improvise o carimbo e não use `report_html` antigo como prova suficiente:
-gere o manifesto pelo backfill versionado do repositório, obtenha autorização específica para
-a lista exata e só então aplique com CAS e readback. Ausência do checkpoint não impede a
-auditoria local, mas impede a publicação do relatório no control plane.
-
-Se o usuário discordar de um patch já publicado, resolva a série pela chave, altere apenas o
-JSON local, incremente a versão e use `reviewctl revision` com o hash exato do parent. Não
-edite uma revisão existente. Se a revisão acrescentar ou trocar um alvo material que não
-estava na fotografia anterior, publique um novo relatório-snapshot com `reviewctl save`, não
-uma simples revisão presa ao digest antigo. A aplicação ocorre pelo oli-app ou por comando
-explicitamente autorizado, nunca como efeito implícito desta skill.
+Separe fatos, inferências e lacunas. Informe identidade, fontes, cobertura, findings, perfil e
+camadas lidas, custo novo, patches/runs/readbacks, parecer corrente e gates ainda pendentes. A
+comunicação termina em **Aplicar patch**, **Aprovar**, **Aguardando processamento** ou **Decisão
+jurídica necessária**; estado técnico interno aparece somente em erro.
+Antes de publicar, aplique também o gate editorial da seção 8.1 do protocolo a todos os campos
+humanos exibidos na UI.

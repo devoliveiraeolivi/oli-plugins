@@ -1,0 +1,53 @@
+{
+  "contract_version": "oli-indexer-ops-host/v1",
+  "executor_site": "local-example",
+  "backend": "docker",
+  "plugin": {
+    "expected_version": "0.1.0+codex.replace-after-install",
+    "expected_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "runtime": {
+    "image_ref": "ghcr.io/devoliveiraeolivi/oli-indexer@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "repo_sha": "0000000000000000000000000000000000000000",
+    "uv_lock_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "platform": "linux/amd64"
+  },
+  "paths": {
+    "artifacts_dir": "./artifacts",
+    "vault_role_id_file": "./secrets/vault-role-id",
+    "vault_secret_id_file": "./secrets/vault-secret-id"
+  },
+  "vault": {
+    "oli_auth_url": "https://auth.example.invalid"
+  },
+  "budgets": {
+    "mode": "off",
+    "llm": {
+      "max_cost_usd": "0",
+      "wall_seconds": 180
+    },
+    "reviewer": {
+      "max_cost_usd": "0",
+      "wall_seconds": 180
+    },
+    "embedding": {
+      "max_cost_usd": "0",
+      "wall_seconds": 120
+    },
+    "vision_page": {
+      "max_cost_usd": "0",
+      "wall_seconds": 120
+    }
+  },
+  "resources": {
+    "cpus": "2",
+    "memory": "2g",
+    "pids_limit": 256,
+    "tmpfs_size": "1g"
+  },
+  "environment": {
+    "LOG_LEVEL": "INFO",
+    "PIPELINE_EXTRACTION_APPROVAL_MODE": "required",
+    "PIPELINE_INDEXING_APPROVAL_MODE": "required"
+  }
+}

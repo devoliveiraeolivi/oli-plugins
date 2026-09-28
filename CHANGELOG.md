@@ -10,7 +10,7 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 #### Added
 
 - Primeira fonte versionada do plugin Codex de operações do `oli-indexer`, com
-  12 skills para consulta segura, rastreabilidade de configuração, execução
+  18 skills para consulta segura, rastreabilidade de configuração, execução
   monitorada e pré-aprovação especializada de processos tributários.
 - Protocolo comum repair-first: publica correções determinísticas como patches
   imutáveis para revisão/aplicação no `oli-app`; aplicação direta continua
@@ -20,6 +20,13 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
   e rotear agravos e produção antecipada de provas pela especialização correta.
 - Marketplace Codex do repositório em `.agents/plugins/marketplace.json` e
   teste determinístico do detector de cadeias processuais incompletas.
+- Pré-aprovação operacional com um único patch exaustivo por estágio: problemas
+  determinísticos terminam em **Aplicar patch**, o runner faz CAS/readback e
+  ativa o parecer antecipado quando o estado final coincide; ambiguidade jurídica
+  permanece decisão humana e a aprovação final nunca é automatizada.
+- Gate de `indexing_input` com `review-patch/v3` reunindo todas as decisões de
+  relações pendentes do snapshot e bloqueando cobertura parcial ou decisão
+  `pending`.
 
 ## oli-dev
 

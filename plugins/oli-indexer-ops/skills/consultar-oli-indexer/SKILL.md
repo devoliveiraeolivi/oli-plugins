@@ -1,6 +1,6 @@
 ---
 name: consultar-oli-indexer
-description: Consultar em modo seguro os bancos OPS e DATA do oli-indexer para localizar jobs, processos, indexações, folhas, relações, prompts, análises, relatórios e custos. Use para diagnóstico, rastreabilidade, auditoria e preparação de execução; leitura é o padrão e qualquer escrita exige pedido explícito separado.
+description: Consultar OPS e DATA do oli-indexer para diagnóstico, rastreabilidade, auditoria e preparação de execução. A skill é somente leitura; qualquer escrita ou execução exige pedido explícito separado.
 ---
 
 # Consultar OLI Indexer
@@ -11,7 +11,10 @@ Antes da primeira consulta da tarefa, leia [references/schema.md](references/sch
 
 ## Regras
 
-- Trabalhe a partir do repositório `oli-indexer` e carregue credenciais pelo `Config.load_with_vault()` do projeto. Nunca imprima chaves, tokens, URLs assinadas ou o conteúdo do `.env`.
+- Trabalhe a partir do checkout local de `oli-indexador` e carregue credenciais
+  pelo `Config.load_with_vault()` do projeto. O repositório histórico
+  `oli-indexer` não é runtime nem fonte operacional. Nunca imprima chaves,
+  tokens, URLs assinadas ou o conteúdo do `.env`.
 - OPS contém fila, resultados do job e telemetria; DATA contém processo, folhas, indexações, prompts e estado persistido. Relacione por `jobs.id → indexacoes.job_id` e `jobs.search_key → numero_processo`.
 - Se o usuário não indicar job/CNJ, liste o universo candidato e informe a quantidade. Para um parecer, bloqueie processos com mais de um job aberto até identificar o vigente.
 - Paginação e ordenação devem ser determinísticas. Não conclua “não existe” após ler apenas a primeira página do PostgREST.
