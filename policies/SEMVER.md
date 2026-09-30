@@ -1,8 +1,7 @@
 # Versionamento — oli-plugins
 
 Cada plugin versiona **independentemente**. A tag do git é **prefixada por
-plugin**: `<plugin>-vMAJOR.MINOR.PATCH` (ex.: `oli-dev-v1.0.0` ou
-`oli-indexer-ops-v0.1.0`).
+plugin**: `<plugin>-vMAJOR.MINOR.PATCH` (ex.: `oli-indexer-ops-v0.1.0`).
 
 - **MAJOR:** quebra na interface do plugin (flags/sintaxe de comando) ou
   remoção de fase/gate.
