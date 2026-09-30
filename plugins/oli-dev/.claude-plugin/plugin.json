@@ -1,7 +1,0 @@
-{
-  "name": "oli-dev",
-  "description": "Conduz o ciclo de desenvolvimento OLI encadeando skills do superpowers com gates opinativos (worktree sempre, um caça-bug por artefato e só sobre artefato que existe, um artefato por ciclo, conductor e review sempre Opus, default enxuto sem review de spec e sem task-reviewer por task e `full` como opt-in que readiciona as duas camadas, pre-push obrigatório, finalize pós-merge). Depende do plugin superpowers.",
-  "author": { "name": "devoliveiraeolivi" },
-  "homepage": "https://github.com/devoliveiraeolivi/oli-plugins",
-  "keywords": ["workflow", "tdd", "code-review", "worktree", "orchestration", "oli"]
-}

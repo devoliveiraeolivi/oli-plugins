@@ -6,15 +6,11 @@ Marketplace de plugins do ecossistema OLI para Claude Code e Codex.
 
 | Plugin | Produto | Descrição |
 |---|---|---|
-| [oli-dev](plugins/oli-dev/) | Claude Code | Maestro do ciclo de desenvolvimento OLI (worktree → brainstorm + plano → TDD → review → pre-push → PR → finalize). |
 | [oli-indexer-ops](plugins/oli-indexer-ops/) | Codex | Consulta, rastreia, executa e pré-aprova jobs do oli-indexer com relatórios e patches versionados, sem substituir a aprovação humana. |
 
-## Instalação no Claude Code
-
-```
-/plugin marketplace add devoliveiraeolivi/oli-plugins
-/plugin install oli-dev
-```
+O antigo `oli-dev` (Claude Code) saiu em 2026-09-30. O ciclo de engenharia agora é a
+skill `engineering-task-harness`, compartilhada por Claude Code e Codex, em
+[`oli-devops/harness`](https://github.com/devoliveiraeolivi/oli-devops/tree/main/harness).
 
 ## Instalação no Codex
 
@@ -29,5 +25,5 @@ nova task para que as skills atualizadas sejam carregadas.
 ## Versionamento
 
 Cada plugin versiona de forma independente, com tag prefixada pelo nome
-(`oli-dev-vX.Y.Z`, `oli-indexer-ops-vX.Y.Z`). Ver
+(ex.: `oli-indexer-ops-vX.Y.Z`). Ver
 [policies/SEMVER.md](policies/SEMVER.md).

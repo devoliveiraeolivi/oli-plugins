@@ -30,6 +30,13 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 
 ## oli-dev
 
+### Removido — 2026-09-30
+
+- Plugin removido do marketplace. O ciclo de engenharia passou para a skill
+  `engineering-task-harness` em `devoliveiraeolivi/oli-devops` (`harness/`), compartilhada por
+  Claude Code e Codex; os hooks `pre-push-gate` e `branch-state-guard` foram portados para lá.
+  Última release: `oli-dev-v1.0.0`. As entradas de `[Unreleased]` abaixo nunca foram lançadas.
+
 ### [Unreleased]
 
 #### Changed
