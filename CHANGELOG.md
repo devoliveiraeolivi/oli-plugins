@@ -27,6 +27,9 @@ Segue [Keep a Changelog](https://keepachangelog.com/) e SemVer por plugin
 - Gate de `indexing_input` com `review-patch/v3` reunindo todas as decisões de
   relações pendentes do snapshot e bloqueando cobertura parcial ou decisão
   `pending`.
+- Referência de pré-aprovação para `tributario/cumprimento_sentenca` (perfil novo do
+  `oli-indexador`, spec 0001 §3.3): abertura e pertinência, cópias do título, virada de fase nos
+  mistos, decisões do cumprimento, requisição → pagamento → levantamento e atos de execução.
 
 ## oli-dev
 

@@ -63,6 +63,8 @@ Resolva `area/perfil/natureza` pelo job e leia exatamente uma referência princi
 - demais naturezas de `tributario/conhecimento`: leia
   [conhecimento tributário](references/profiles/conhecimento-tributario.md), mas só admita `APTO`
   quando houver seção material explícita para a natureza; não transporte gates por analogia;
+- `tributario/cumprimento_sentenca`:
+  [cumprimento de sentença](references/profiles/cumprimento-sentenca.md);
 - `tributario/agravo_instrumento` + natureza `Agravo de Instrumento`:
   [agravo de instrumento](references/profiles/agravo-instrumento.md);
 - `tributario/cautelar_fiscal`:
